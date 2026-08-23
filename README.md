@@ -1,71 +1,59 @@
-# CollectionBuilder-GH
+# Palestinian Children and Community Archive — Collection Data
 
-A project to generate a free and simple digital collection site using [GitHub Pages](https://pages.github.com/) given:
+The digital collection site for the [Palestinian Children and Community Archive](https://palestinian-children-archive.github.io/), publishing the dataset that documents Palestinian childhood during the British Mandate of Palestine.
 
-- a CSV of collection metadata
-- a folder of JPEG images, PDF documents, MP3s, or links to videos hosted on YouTube or Vimeo
+**Live site:** <https://palestinian-children-archive.github.io/pcca/>
 
-Visit the [demo site](https://collectionbuilder.github.io/collectionbuilder-gh/).
+The two sites link to each other: the main archive links here from its menu, home page, and footer, and every page here links back via the "Main Archive" nav item.
 
-## Build a Digital Collection
+## What's in it
 
-Gather your digital objects together and create your metadata using the [CollectionBuilder-GH Metadata Template](https://docs.google.com/spreadsheets/d/1Uv9ytll0hysMOH1j-VL1lZx6PWvc1zf3L35sK_4IuzI/copy) and [metadata docs](https://collectionbuilder.github.io/cb-docs/docs/metadata/gh_metadata/). 
+`_data/pcca_processed.csv` holds 6,388 catalogue records — newspapers, government and court papers, correspondence, photographs, maps, and recorded interviews — drawn from nineteen holding institutions including the National Library of Israel, the British Library's Qatar Digital Library, the Knesset archive, Yale University, Columbia University, and the British National Archives.
 
-Then click the green "use this template" button to create your repository, and add your metadata and configure the repository to fit your collection and settings following the [CollectionBuilder Docs](https://collectionbuilder.github.io/cb-docs/). 
+Records are descriptive metadata with links out to the holding institution; the items themselves are not hosted here.
 
-Please feel free to ask questions in the main [CollectionBuilder discussion forum](https://github.com/CollectionBuilder/collectionbuilder.github.io/discussions).
+| | |
+|---|---|
+| Records | 6,388 |
+| Dated range | 1830s – mid-20th century |
+| Languages | 27 languages or combinations, chiefly Arabic, English, Hebrew |
+| Resource types | text, image, map, video, interview |
 
-**Note:** 
-Since CollectionBuilder-GH uses [GitHub Pages](https://pages.github.com/), it is only suitable for small collections, with lower resolution images. 
-GitHub repositories are limited to 1GB.
-For larger collections or those that require more customization, check out the [CollectionBuilder-CSV](https://github.com/CollectionBuilder/collectionbuilder-csv) template.
+## Built with
 
-## CollectionBuilder-GH Quick Tutorial
+[CollectionBuilder-GH](https://github.com/CollectionBuilder/collectionbuilder-gh) — a Jekyll static site generated from a metadata CSV, served by GitHub Pages. Upstream is MIT licensed; see `LICENSE`.
 
-Follow the [CollectionBuilder-GH Walkthrough](https://collectionbuilder.github.io/cb-docs/docs/walkthroughs/gh-walkthrough/) to set up a collection quickly using demo metadata and objects. 
+GitHub Pages rebuilds the site automatically on every push to `main`.
 
-- [Demo Metadata](https://docs.google.com/spreadsheets/d/1x48Te3duPAxh53foEihQVKTfCKUjaCCbH7TrMMd_yU4/copy)
-- [Demo Objects](https://www.lib.uidaho.edu/collectionbuilder/demo-objects.zip)
+## Working on it locally
 
-## Teaching and Learning with CollectionBuilder-GH
+```bash
+bundle install
+bundle exec jekyll serve
+```
 
-CollectionBuilder-GH is intended as a simple template for hands-on teaching about digital libraries.
-It can be used in a workshop setting to take participants through digitization and metadata creation, to having a live collection site hosted on GitHub.
+The build reads the whole metadata CSV, so a full build takes roughly three to four minutes.
 
-CollectionBuilder-GH aims to be well documented and easy to configure by following the documentation, with the potential to scaffold learning of a multitude of transferable digital and data skills.
-A project in "minimal computing", it provides a depth of learning opportunities, allowing users to take complete ownership over the project and make their work open to the world.
+### Configuration
 
-Learn about:
+| File | Controls |
+|---|---|
+| `_config.yml` | Site title, description, `baseurl`, which CSV is the metadata source |
+| `_data/theme.yml` | Colours, fonts, navbar, home page and per-page options |
+| `_data/config-nav.csv` | Navigation items |
+| `_data/config-metadata.csv` | Fields shown on item pages |
+| `_data/config-browse.csv` | Fields shown on browse cards |
+| `_data/config-search.csv` | Fields indexed and displayed in search |
+| `_data/config-table.csv` | Columns on the Data page |
+| `_data/config-theme-colors.csv` | Bootstrap theme colours |
+| `_sass/_custom.scss` | Site styling, as a token and mixin design system |
 
-- Git and GitHub basics
-- [Markdown](https://guides.github.com/features/mastering-markdown/), plaintext writing and content creation
-- HTML, CSS, and JavaScript literacy
-- command line literacy
-- GitHub collaboration and project management
-- [Jekyll](https://jekyllrb.com/) basics
-- working in the Open, open source and open data
-- digital libraries concepts such as "collections as data", minimal computing, data-driven design
+Field names in the `config-*.csv` files must match columns that exist in the metadata CSV. Fields that do not exist render as blank or `n/a`.
 
-> We prefer commonly understood formats (such as CSV spreadsheets over YAML), and convention over configuration (follow the example over learn all the options).
+### A note on build cost
 
-----------
+`_includes/index/featured-terms.html` counts terms with a `where_exp` scan per unique term, so its cost is O(unique × total). It is fine for `subject` (785 unique terms) but not for `lcsh` (2,901 unique across ~50,000 instances), which pushes the build past the ten-minute GitHub Pages timeout. The same applies to the subject cloud: `subjects-min` in `_data/theme.yml` trims the long tail of single-occurrence terms.
 
-## CollectionBuilder 
+## Notes on the data
 
-<https://collectionbuilder.github.io/>
-
-CollectionBuilder is a project of University of Idaho Library's [Digital Initiatives](https://www.lib.uidaho.edu/digital/) and the [Center for Digital Inquiry and Learning](https://cdil.lib.uidaho.edu) (CDIL) following the [Lib-Static](https://lib-static.github.io/) methodology. 
-Powered by the open source static site generator [Jekyll](https://jekyllrb.com/) and a modern static web stack, it puts collection metadata to work building beautiful sites.
-
-The basic theme is created using [Bootstrap](https://getbootstrap.com/).
-Metadata visualizations are built using open source libraries such as [DataTables](https://datatables.net/), [Leafletjs](http://leafletjs.com/), [Spotlight gallery](https://github.com/nextapps-de/spotlight), [lazysizes](https://github.com/aFarkas/lazysizes), and [Lunr.js](https://lunrjs.com/).
-Object metadata is exposed using [Schema.org](http://schema.org) and [Open Graph protocol](http://ogp.me/) standards.
-
-Questions can be directed to **collectionbuilder.team@gmail.com**
-
-## License
-
-CollectionBuilder documentation and general web content is licensed [Creative Commons Attribution-ShareAlike 4.0 International](http://creativecommons.org/licenses/by-sa/4.0/). 
-This license does *NOT* include any objects or images used in digital collections, which may have individually applied licenses described by a "rights" field.
-CollectionBuilder code is licensed [MIT](https://github.com/CollectionBuilder/collectionbuilder-csv/blob/master/LICENSE). 
-This license does not include external dependencies included in the `assets/lib` directory, which are covered by their individual licenses.
+The Locations and Map pages are not enabled: the metadata has no location or latitude/longitude columns for them to draw on. Adding those columns and re-enabling the pages in `_data/config-nav.csv` is all that is needed.

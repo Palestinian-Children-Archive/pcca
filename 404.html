@@ -3,20 +3,17 @@ title: Page Not Found
 layout: page
 permalink: /404.html
 # this creates a 404 page automatically handled by gh-pages
-# the cow is from the linux program "cowsay"
 ---
 
-<h1>404?</h1>
-<p>Sorry, but the page you were trying to view does not exist.</p>
-
-<pre><code>
- ____________
-< Sorry, 404 >
- ------------
-        \   ^__^
-         \  (oo)\_______
-            (__)\       )\/\
-                ||----w |
-                ||     ||
-
-</code></pre>
+<div class="text-center py-5" id="not-found">
+    <p class="display-1 mb-2">404</p>
+    <h1 class="h3 mb-3">We couldn't find that page</h1>
+    <p class="lead text-muted mb-4">
+        The page you were looking for doesn't exist, or it may have moved.
+    </p>
+    <p>
+        <a class="btn btn-primary" href="{{ '/' | relative_url }}">Collection home</a>
+        <a class="btn btn-secondary" href="{{ '/browse.html' | relative_url }}">Browse all records</a>
+        <a class="btn btn-secondary" href="{{ site.organization-link }}">Main archive</a>
+    </p>
+</div>
