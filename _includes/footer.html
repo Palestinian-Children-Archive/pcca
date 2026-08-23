@@ -1,21 +1,21 @@
-<footer class="bg-dark pt-4 mt-auto container-fluid">
+<footer class="pt-4 mt-auto container-fluid" id="site-footer">
 
-    <div class="row border-bottom border-white pb-4 mb-2">
+    <div class="row border-bottom pb-4 mb-2">
 
         <div class="col-md-7 px-4 mt-3">
 
-            <h2 class="h4"><a href="{{ '/' | relative_url }}" class="text-white">{{ site.title }}</a></h2>
-            <p class="text-white"><small>{{ site.description }}</small></p>
+            <h2 class="h4"><a href="{{ '/' | relative_url }}" class="footer-title">{{ site.title }}</a></h2>
+            <p class="footer-muted"><small>{{ site.description }}</small></p>
             <nav>
                 <ul id="footer-nav" class="nav nav-pills ">
                     {%- assign navItems = site.data.config-nav | where_exp: 'item', 'item.dropdown_parent == nil' -%}
                     {% for nav in navItems %}
                     <li class="nav-item">
                     {% if nav.stub %}
-                        <a class="nav-link text-light{% if page.url == nav.stub %} active{% endif %}" href="{{ nav.stub | relative_url }}">{{ nav.display_name }}</a>
+                        <a class="nav-link{% if page.url == nav.stub %} active{% endif %}" href="{% if nav.stub contains '://' %}{{ nav.stub }}{% else %}{{ nav.stub | relative_url }}{% endif %}">{{ nav.display_name }}</a>
                     {%- else -%}
                     {% assign childStub = site.data.config-nav | where_exp: 'item', 'item.dropdown_parent == nav.display_name' | first %}
-                        <a class="nav-link text-light{% if page.url == childStub.stub %} active{% endif %}" href="{{ childStub.stub | relative_url }}">{{ nav.display_name }}</a>
+                        <a class="nav-link{% if page.url == childStub.stub %} active{% endif %}" href="{{ childStub.stub | relative_url }}">{{ nav.display_name }}</a>
                     {% endif %}
                     </li>
                     {%- endfor -%}
@@ -24,15 +24,23 @@
 
         </div>
 
-        <div class="col-md-5 mt-3 text-center">
+        <div class="col-md-5 mt-3 text-center text-md-end px-4">
 
-           {% if site.organization-logo-nav %} <p class="text-md-end">
+            {% if site.organization-link %}
+            <p class="mb-2">
+                {% if site.organization-logo-nav %}
                 <a href="{{ site.organization-link }}">
                     <img id="footer-logo" class="img-fluid" src="{{ site.organization-logo-nav | relative_url }}" alt="{{ site.organization-name | escape }} home">
                 </a>
+                {% else %}
+                <a href="{{ site.organization-link }}" class="btn btn-outline-primary btn-sm">
+                    &larr; Back to the {{ site.organization-name }}
+                </a>
+                {% endif %}
             </p>
             {% endif %}
-            <p class="text-white text-md-end" id="footer-credits">
+
+            <p class="footer-muted" id="footer-credits">
                 <small><em>built with</em>
                     <a href="https://collectionbuilder.github.io/" title="CollectionBuilder">
                         <img src="{{ '/assets/img/collectionbuilder-logo.png' | relative_url }}" class="img-fluid" alt="CollectionBuilder" >
@@ -45,7 +53,10 @@
     </div>
 
     <div class="col-md-12 text-center pt-3 pb-1">
-        <p class="text-white">Last updated {{ site.time | date: '%Y' }}</p>
+        <p class="footer-muted mb-1"><small>All images displayed are used from the public domains Wikimedia Commons and GetArchive.
+            We do not claim ownership of any images displayed from these platforms within this website.</small></p>
+        <p class="footer-muted mb-1"><small>Built with <span class="footer-heart">&#10084;</span> by Palestinians
+            &nbsp;&middot;&nbsp; &copy; {{ site.time | date: '%Y' }} All rights reserved</small></p>
     </div>
 
 </footer>
