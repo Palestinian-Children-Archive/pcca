@@ -20,8 +20,16 @@
 {%- assign date-items = site.data[site.metadata] | where_exp: 'item', 'item.objectid' | where_exp: 'item','item.parentid == nil' -%}
 {% endif %}
 {%- assign raw-dates = date-items | map: date_field | compact | uniq -%}
-{%- capture clean-years -%}{% for date in raw-dates %}{% if date contains "-" %}{{ date | strip | split: "-" | first }}{% elsif date contains "/" %}{{ date | strip | split: "/" | last }}{% else %}{{ date | strip }}{% endif %}{% unless forloop.last %};{% endunless %}{%- endfor -%}{%- endcapture -%}
-{%- assign date-range = clean-years | remove: " " | split: ";" | uniq | sort  -%}
+{%- comment -%}
+    Pull a four-digit year off each end of the date string and keep whatever
+    falls in a plausible range. The original logic split on "-" or "/" and then
+    stripped every space from the joined result, which turned "September 17,
+    1947" into "September17,1947" and, because the list is sorted as text, made
+    that string sort last and appear as the collection's end date. Working in
+    years keeps the sort numeric-by-text and the output clean.
+{%- endcomment -%}
+{%- capture clean-years -%}{% for date in raw-dates %}{% assign d = date | strip %}{% assign head = d | slice: 0, 4 | plus: 0 %}{% assign tail = d | slice: -4, 4 | plus: 0 %}{% if head > 1700 and head < 2100 %}{{ head }};{% endif %}{% if tail > 1700 and tail < 2100 %}{{ tail }};{% endif %}{%- endfor -%}{%- endcapture -%}
+{%- assign date-range = clean-years | split: ";" | uniq | sort -%}
 <div class="card mb-3">
     <div class="card-body">
         <{{ include.heading_level | default: 'h2' | strip }} class="card-title h5">Time Span</{{ include.heading_level | default: 'h2' | strip }}>

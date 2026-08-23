@@ -23,15 +23,15 @@ browse-buttons: true # true/false, adds previous/next arrows to item pages
 ##########
 # SUBJECTS PAGE
 #
-subjects-fields: subject;creator # set the field to be featured in the cloud (if left blank, none will be generated)
-subjects-min: 1 # min size for subject cloud, too many terms = slow load time!
+subjects-fields: subject # set the field to be featured in the cloud (if left blank, none will be generated)
+subjects-min: 3 # min size for subject cloud, too many terms = slow load time!
 subjects-stopwords: # boxers;boxing;boxer # set of subjects separated by ;, e.g. boxers;boxing
 
 ##########
 # LOCATIONS PAGE
 #
-locations-fields: location # set the field to be featured in the cloud
-locations-min: 1 # min size for subject cloud, too many terms = slow load time!
+locations-fields: # set the field to be featured in the cloud
+locations-min: 3 # min size for subject cloud, too many terms = slow load time!
 locations-stopwords: # set of subjects separated by ; that will be removed from display, e.g. boxers;boxing
 
 ##########
@@ -59,9 +59,9 @@ year-nav-increment: 5 # set increments when auto gen nav years
 #
 # add metadata fields for export in data downloads (tip: paste in first row of csv)
 # comma delimited list, reference url is automatic
-metadata-export-fields: "title,creator,date,description,subject,location,latitude,longitude,source,identifier,type,format,language,rights,rightsstatement"
+metadata-export-fields: "record_id,title,author,date,subject,lcsh,resource_type,data_sources,language,origin,link,summary,format,objectid"
 # generate a facets list for given fields, comma delimited
-metadata-facets-fields: "subject,creator,format"
+metadata-facets-fields: "subject,resource_type,language,origin"
 
 ##########
 # COMPOUND OBJECTS
@@ -94,7 +94,7 @@ navbar-background: bg-white
 bootswatch: # leave blank or comment out for plain bootstrap
 
 # THEME FONTS
-base-font-size: 1.2em
+base-font-size: 1rem
 text-color: "#2D3748"
 link-color: "#2C5282"
 base-font-family: Roboto

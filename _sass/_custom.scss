@@ -1,144 +1,1198 @@
 /*
-    Palestinian Children and Community Archive — collection site theme.
+   ===========================================================================
+   Palestinian Children and Community Archive — collection site design system
+   ===========================================================================
 
-    Mirrors the visual language of the main archive site
-    (https://palestinian-children-archive.github.io/), whose MUI theme uses:
-      primary #2C5282 / light #4A90E2 / dark #1A365D
-      secondary #718096, background #F7FAFC, text #2D3748 / #4A5568
-      Roboto, 8px button radius, 12px card radius, flat (elevation 0) app bar.
+   Tracks the main archive (https://palestinian-children-archive.github.io/),
+   whose MUI theme defines:
+
+     primary    #2C5282   light #4A90E2   dark #1A365D   darker #102A43
+     secondary  #718096
+     background #F7FAFC   paper #FFFFFF
+     text       #2D3748 / #4A5568
+     Roboto; 8px button radius; 12px card radius; flat elevation-0 app bar;
+     cards lift 4px on hover; hero is a dark-scrimmed photo behind a
+     primary.dark panel; the menu drawer adds a 20px grid pattern.
+
+   Structure: tokens -> mixins -> base -> components. Components are composed
+   from the mixins so radii, shadows, motion and focus behaviour stay in one
+   place; change a token, not a rule.
+   ===========================================================================
 */
 
-$archive-bg: #F7FAFC;
-$archive-text: #2D3748;
-$archive-text-muted: #4A5568;
-$archive-footer-bg: #F5F5F5;
-$archive-border: #E2E8F0;
+// ===========================================================================
+// 1. TOKENS
+// ===========================================================================
 
-/* ---------- Typography ---------- */
+// -- colour ----------------------------------------------------------------
+$pca-navy-darkest: #102A43;
+$pca-navy:         #1A365D;
+$pca-navy-hover:   #16304F;
+$pca-blue:         #2C5282;
+$pca-blue-hover:   #24466F;
+$pca-blue-light:   #4A90E2;
+$pca-slate:        #718096;
+$pca-slate-light:  #A0AEC0;   // archive secondary.light
+$pca-bg:           #F7FAFC;
+$pca-surface:      #FFFFFF;
+$pca-surface-alt:  #F5F5F5;
+$pca-text:         #2D3748;
+$pca-text-muted:   #4A5568;
+$pca-border:       #E2E8F0;
+$pca-border-soft:  #EDF2F7;
+
+// Translucent brand washes, used for hovers and tinted tiles.
+$pca-wash-04: rgba(44, 82, 130, .04);
+$pca-wash-07: rgba(44, 82, 130, .07);
+$pca-wash-12: rgba(44, 82, 130, .12);
+$pca-wash-18: rgba(44, 82, 130, .18);
+
+// -- radius ----------------------------------------------------------------
+$pca-r-sm:   6px;
+$pca-r-btn:  8px;
+$pca-r-card: 12px;
+$pca-r-lg:   16px;
+$pca-r-pill: 999px;
+
+// -- elevation -------------------------------------------------------------
+$pca-shadow-xs: 0 1px 2px rgba(16, 42, 67, .05);
+$pca-shadow-sm: 0 1px 3px rgba(16, 42, 67, .07);
+$pca-shadow-md: 0 4px 14px rgba(16, 42, 67, .09);
+$pca-shadow-lg: 0 14px 32px rgba(16, 42, 67, .16);
+
+// -- motion ----------------------------------------------------------------
+$pca-ease:      .25s cubic-bezier(.4, 0, .2, 1);
+$pca-ease-fast: .15s cubic-bezier(.4, 0, .2, 1);
+$pca-lift:      -4px;   // the archive's card hover distance
+
+// -- type ------------------------------------------------------------------
+$pca-font: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+// -- spacing ---------------------------------------------------------------
+$pca-space-1: .25rem;
+$pca-space-2: .5rem;
+$pca-space-3: .75rem;
+$pca-space-4: 1rem;
+$pca-space-5: 1.5rem;
+$pca-space-6: 2rem;
+$pca-space-7: 3rem;
+
+// ===========================================================================
+// 2. MIXINS  (shared behaviour — components compose these)
+// ===========================================================================
+
+/// The archive menu-drawer grid, reused as a texture on navy panels.
+@mixin pca-grid-texture($alpha: .16, $size: 20px) {
+    background-image:
+        linear-gradient(rgba(0, 0, 0, $alpha) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 0, 0, $alpha) 1px, transparent 1px);
+    background-size: $size $size;
+}
+
+/// Base surface for every raised panel.
+@mixin pca-surface($radius: $pca-r-card, $shadow: $pca-shadow-sm) {
+    background-color: $pca-surface;
+    border: 1px solid $pca-border;
+    border-radius: $radius;
+    box-shadow: $shadow;
+}
+
+/// Hover treatment for surfaces that navigate somewhere.
+@mixin pca-lift($distance: $pca-lift) {
+    transition: transform $pca-ease, box-shadow $pca-ease, border-color $pca-ease;
+
+    &:hover {
+        transform: translateY($distance);
+        box-shadow: $pca-shadow-lg;
+        border-color: rgba(74, 144, 226, .45);
+    }
+}
+
+/// Rounded chip used for tags, cloud terms and footer nav.
+@mixin pca-chip($bg: $pca-wash-12, $fg: $pca-text-muted) {
+    display: inline-block;
+    border-radius: $pca-r-pill;
+    background-color: $bg;
+    border: 1px solid transparent;
+    color: $fg;
+    font-size: .78rem;
+    font-weight: 500;
+    line-height: 1.5;
+    padding: $pca-space-1 $pca-space-3;
+    text-decoration: none;
+    transition: background-color $pca-ease, color $pca-ease, transform $pca-ease-fast;
+
+    &:hover,
+    &:focus {
+        background-color: $pca-blue;
+        color: #fff;
+        text-decoration: none;
+        transform: translateY(-1px);
+    }
+}
+
+/// One consistent, visible focus ring everywhere.
+@mixin pca-focus-ring($color: rgba(74, 144, 226, .5)) {
+    outline: 3px solid $color;
+    outline-offset: 2px;
+}
+
+/// Section heading with the archive's tight letter-spacing.
+@mixin pca-heading($size: 1.15rem, $weight: 600) {
+    color: $pca-navy;
+    font-family: $pca-font;
+    font-size: $size;
+    font-weight: $weight;
+    letter-spacing: -0.01em;
+    line-height: 1.35;
+}
+
+/// CollectionBuilder renders format icons as a black SVG at w-50, which
+/// dominates any card it lands in (browse items and timeline entries both).
+/// Shrink it into a soft tinted tile. Deliberately matches any non-thumbnail
+/// img: lazysizes renames .lazyload to .lazyloaded once loaded, so keying off
+/// .lazyload stops matching after load.
+@mixin pca-format-icon($size: 58px) {
+    width: $size !important;
+    height: $size;
+    padding: $size * .21;
+    object-fit: contain;
+    opacity: .38;
+    background: $pca-wash-07;
+    border-radius: $pca-r-card;
+    transition: opacity $pca-ease, background-color $pca-ease;
+}
+
+/// Clamp text to N lines so card grids stay on a rhythm.
+@mixin pca-clamp($lines: 3) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+// ===========================================================================
+// 3. BASE
+// ===========================================================================
 
 body {
-    font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    background-color: $archive-bg;
-    color: $archive-text;
+    font-family: $pca-font;
+    background-color: $pca-bg;
+    color: $pca-text;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 h1, h2, h3, h4, h5, h6,
-.h1, .h2, .h3, .h4, .h5, .h6 {
-    font-family: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
-    color: $archive-text;
+.h1, .h2, .h3, .h4, .h5, .h6 { @include pca-heading(inherit, 600); }
+
+// Headings inside light-on-dark containers must inherit, not force navy.
+.text-white,
+.bg-dark,
+.bg-primary,
+.bg-secondary,
+.jumbo-title-box {
+    h1, h2, h3, h4, h5, h6,
+    .h1, .h2, .h3, .h4, .h5, .h6 { color: inherit; }
 }
 
-h1, .h1 { font-weight: 700; }
-h3, .h3 { font-weight: 600; }
-h4, .h4 { font-weight: 500; }
-h6, .h6 { font-weight: 500; }
+h1, .h1 { font-size: 2.25rem; font-weight: 700; letter-spacing: -0.02em; }
+h2, .h2 { font-size: 1.75rem; font-weight: 700; }
+h3, .h3 { font-size: 1.4rem; }
+h4, .h4 { font-size: 1.2rem; }
+h5, .h5 { font-size: 1.05rem; font-weight: 500; }
+h6, .h6 { font-size: .95rem; font-weight: 500; }
 
-p, .body1 { line-height: 1.7; }
+p { margin-bottom: $pca-space-4; }
 
-/* ---------- Navbar: flat white bar, matching the archive AppBar ---------- */
+a {
+    color: $pca-blue;
+    text-decoration: none;
+    transition: color $pca-ease;
+
+    &:hover { color: $pca-navy; text-decoration: underline; }
+}
+
+small, .small { font-size: .875rem; }
+
+strong, b { font-weight: 600; color: $pca-text; }
+
+code, pre {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: .875em;
+}
+
+code {
+    background: $pca-wash-07;
+    color: $pca-navy;
+    padding: .1rem .35rem;
+    border-radius: $pca-r-sm;
+}
+
+pre {
+    @include pca-surface($pca-r-card, $pca-shadow-xs);
+    padding: $pca-space-4;
+    overflow-x: auto;
+}
+
+hr { border: 0; border-top: 1px solid $pca-border; opacity: 1; margin: $pca-space-5 0; }
+
+blockquote {
+    border-left: 4px solid $pca-blue-light;
+    padding: $pca-space-1 0 $pca-space-1 $pca-space-4;
+    margin-left: 0;
+    color: $pca-text-muted;
+    font-style: italic;
+}
+
+img { max-width: 100%; }
+
+::selection { background: rgba(74, 144, 226, .25); }
+
+:focus-visible { @include pca-focus-ring; }
+
+main { padding-bottom: $pca-space-7; }
+
+// Reduced-motion users get state changes without movement.
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .001ms !important;
+        transition-duration: .001ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .card:hover,
+    .item .card:hover,
+    .btn:hover { transform: none !important; }
+}
+
+// ===========================================================================
+// 4. NAVBAR
+// ===========================================================================
 
 .navbar {
     min-height: 70px;
-    background-color: #fff !important;
-    border-bottom: 1px solid $archive-border;
+    padding-top: 0;
+    padding-bottom: 0;
+    background-color: $pca-surface !important;
+    border-bottom: 1px solid $pca-border;
     box-shadow: none;
 
     .navbar-brand {
-        color: #000;
-        font-size: 1.5rem;
-        font-weight: 400;
-        transition: transform 0.3s ease;
+        @include pca-heading(1.2rem, 600);
+        color: $pca-navy;
+        transition: transform $pca-ease;
 
-        &:hover { transform: scale(1.02); }
+        &:hover { transform: scale(1.02); text-decoration: none; }
     }
 
     .nav-link {
-        color: $archive-text;
-        border-radius: 20px;
-        padding-left: 1rem;
-        padding-right: 1rem;
-        transition: all 0.3s ease;
+        color: $pca-text;
+        font-size: .95rem;
+        font-weight: 500;
+        padding: $pca-space-2 $pca-space-4;
+        margin: 0 .1rem;
+        border-radius: $pca-r-pill;
+        transition: color $pca-ease, background-color $pca-ease;
+
+        &:hover,
+        &:focus { color: $pca-blue; background-color: $pca-wash-07; }
+
+        &.active { color: $pca-blue; font-weight: 700; background-color: $pca-wash-12; }
+    }
+
+    .navbar-toggler {
+        border: 1px solid $pca-border;
+        border-radius: $pca-r-btn;
+        padding: .35rem .6rem;
+
+        &:focus { box-shadow: none; @include pca-focus-ring; }
+    }
+
+    .dropdown-menu {
+        @include pca-surface($pca-r-card, $pca-shadow-md);
+        padding: $pca-space-2;
+        margin-top: $pca-space-2;
+
+        .dropdown-item {
+            border-radius: $pca-r-btn;
+            padding: $pca-space-2 $pca-space-3;
+            font-size: .93rem;
+
+            &:hover, &:focus { background-color: $pca-wash-07; color: $pca-blue; }
+            &.active { background-color: $pca-blue; color: #fff; }
+        }
+    }
+}
+
+// Nav search sits flush as one control.
+#nav-search,
+.navbar form {
+    .form-control {
+        border-color: $pca-border;
+        border-right: 0;
+        border-radius: $pca-r-btn 0 0 $pca-r-btn;
+    }
+
+    .btn {
+        border-radius: 0 $pca-r-btn $pca-r-btn 0;
+    }
+}
+
+// ===========================================================================
+// 5. PAGE HEADERS
+// ===========================================================================
+
+// -- home hero -------------------------------------------------------------
+#home-banner {
+    position: relative;
+
+    // Dark scrim over the photograph, as on the archive hero.
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(16, 42, 67, .40) 0%, rgba(16, 42, 67, .62) 100%);
+    }
+
+    > * { position: relative; z-index: 1; }
+}
+
+#home-title-box {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // Bootstrap renders a .bg-dark band here; restyle it into the archive panel.
+    > .bg-dark {
+        background-color: rgba(26, 54, 93, .90) !important;
+        @include pca-grid-texture(.16);
+        max-width: 62rem;
+        margin: 0 auto;
+        padding: $pca-space-7 $pca-space-6 !important;
+        border-radius: $pca-r-card;
+        box-shadow: $pca-shadow-lg;
+    }
+
+    h1 {
+        color: #fff;
+        font-size: clamp(1.75rem, 4vw, 3rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        line-height: 1.15;
+        margin-bottom: $pca-space-3;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+    }
+
+    p {
+        color: rgba(255, 255, 255, .88);
+        font-size: 1.08rem;
+        font-weight: 300;
+        margin-bottom: 0;
+    }
+
+    a { color: #fff; }
+}
+
+// -- inner page title band -------------------------------------------------
+#title {
+    h1 {
+        margin-top: $pca-space-5;
+        margin-bottom: $pca-space-1;
+
+        a { color: $pca-navy !important; text-decoration: none; }
+        a:hover { color: $pca-blue !important; }
+    }
+
+    p { color: $pca-text-muted; margin-bottom: $pca-space-4; }
+}
+
+// ===========================================================================
+// 6. CARDS
+// ===========================================================================
+
+.card {
+    @include pca-surface;
+    overflow: hidden;
+
+    .card-body { padding: $pca-space-5; }
+
+    .card-title {
+        @include pca-heading(1.1rem, 600);
+        margin-bottom: $pca-space-3;
+    }
+
+    .card-text { color: $pca-text-muted; }
+
+    .card-header {
+        background-color: $pca-wash-04;
+        border-bottom: 1px solid $pca-border;
+        @include pca-heading(1rem, 600);
+        padding: $pca-space-3 $pca-space-5;
+    }
+
+    .card-footer {
+        background-color: $pca-wash-04;
+        border-top: 1px solid $pca-border;
+        padding: $pca-space-3 $pca-space-5;
+    }
+}
+
+// ===========================================================================
+// 7. BUTTONS
+// ===========================================================================
+
+.btn {
+    border-radius: $pca-r-btn;
+    font-weight: 500;
+    letter-spacing: 0;
+    padding: .5rem 1.5rem;
+    text-transform: none;
+    transition: color $pca-ease, background-color $pca-ease,
+                border-color $pca-ease, box-shadow $pca-ease, transform $pca-ease-fast;
+
+    &:focus-visible { @include pca-focus-ring; box-shadow: none; }
+}
+
+.btn-sm  { padding: .3rem .9rem;  font-size: .85rem; border-radius: $pca-r-btn; }
+.btn-lg  { padding: .7rem 2rem;   font-size: 1.05rem; }
+
+.btn-primary {
+    box-shadow: 0 1px 2px rgba(26, 54, 93, .2);
+
+    &:hover { box-shadow: $pca-shadow-md; transform: translateY(-1px); }
+}
+
+.btn-outline-primary,
+.btn-outline-secondary {
+    &:hover { transform: translateY(-1px); }
+}
+
+// Secondary reads as a quiet outlined control rather than a grey slab.
+.btn-secondary {
+    background-color: $pca-surface;
+    border-color: $pca-border;
+    color: $pca-blue;
+    box-shadow: $pca-shadow-xs;
+
+    &:hover, &:focus {
+        background-color: $pca-blue;
+        border-color: $pca-blue;
+        color: #fff;
+        box-shadow: $pca-shadow-md;
+        transform: translateY(-1px);
+    }
+}
+
+// DataTables' Excel / CSV export buttons.
+.dt-buttons .btn,
+.dt-button {
+    background: $pca-surface !important;
+    border: 1px solid $pca-border !important;
+    border-radius: $pca-r-btn !important;
+    color: $pca-blue !important;
+    font-size: .88rem;
+    font-weight: 500;
+    margin-right: $pca-space-2;
+    padding: .35rem 1rem !important;
+    box-shadow: $pca-shadow-xs;
+
+    &:hover {
+        background: $pca-blue !important;
+        border-color: $pca-blue !important;
+        color: #fff !important;
+    }
+}
+
+// ===========================================================================
+// 8. CHIPS, BADGES, TAGS
+// ===========================================================================
+
+.badge { border-radius: $pca-r-pill; font-weight: 500; letter-spacing: .01em; }
+
+// Subject / location chips rendered inside item cards.
+.btn-sm.btn-secondary,
+.btn-sm.btn-outline-secondary {
+    @include pca-chip;
+    padding: $pca-space-1 $pca-space-3;
+}
+
+// ===========================================================================
+// 9. FORMS
+// ===========================================================================
+
+.form-control,
+.form-select {
+    border-color: $pca-border;
+    border-radius: $pca-r-btn;
+    color: $pca-text;
+    padding: .55rem .9rem;
+    transition: border-color $pca-ease, box-shadow $pca-ease;
+
+    &::placeholder { color: $pca-slate-light; }
+
+    &:focus {
+        border-color: $pca-blue-light;
+        box-shadow: 0 0 0 .2rem rgba(74, 144, 226, .18);
+    }
+}
+
+.form-label { font-weight: 500; color: $pca-text; }
+
+.input-group {
+    .form-control:not(:last-child) { border-radius: $pca-r-btn 0 0 $pca-r-btn; }
+    .btn:last-child { border-radius: 0 $pca-r-btn $pca-r-btn 0; }
+}
+
+// ===========================================================================
+// 10. BROWSE
+// ===========================================================================
+
+// Sort control on browse.
+#browseSortButton {
+    background-color: $pca-surface;
+    border: 1px solid $pca-border;
+    color: $pca-text;
+    font-weight: 500;
+    box-shadow: $pca-shadow-xs;
+
+    &:hover, &:focus, &.show {
+        background-color: $pca-wash-07;
+        border-color: $pca-blue-light;
+        color: $pca-navy;
+    }
+}
+
+.browse-sort-menu {
+    .browse-sort-item {
+        border-radius: $pca-r-btn;
+        font-size: .93rem;
+        padding: $pca-space-2 $pca-space-3;
+
+        &:hover { background-color: $pca-wash-07; color: $pca-blue; }
+        &.active { background-color: $pca-blue; color: #fff; }
+    }
+}
+
+// Filter bar above the results grid.
+#browse-filter,
+.browse-filter {
+    @include pca-surface($pca-r-card, $pca-shadow-xs);
+    padding: $pca-space-4;
+    margin-bottom: $pca-space-5;
+}
+
+#item-count,
+.item-count {
+    color: $pca-text-muted;
+    font-weight: 500;
+}
+
+.item {
+    margin-bottom: $pca-space-4 !important;
+
+    .card {
+        height: 100%;
+        @include pca-lift;
+    }
+
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        padding: $pca-space-4 $pca-space-4 $pca-space-3;
+        text-align: center;
+    }
+
+    .card-title {
+        @include pca-heading(1.02rem, 600);
+        @include pca-clamp(3);
+        margin-bottom: $pca-space-3;
+
+        a {
+            color: $pca-navy !important;
+            text-decoration: none;
+
+            &:hover { color: $pca-blue !important; }
+        }
+    }
+
+    img:not(.card-img-top):not(.img-thumbnail) { @include pca-format-icon; }
+
+    &:hover img:not(.card-img-top):not(.img-thumbnail) {
+        opacity: .55;
+        background: $pca-wash-12;
+    }
+
+    .card-img-top {
+        aspect-ratio: 4 / 3;
+        object-fit: cover;
+        border-bottom: 1px solid $pca-border;
+    }
+
+    .card-text {
+        color: $pca-text-muted;
+        font-size: .9rem;
+        line-height: 1.6;
+
+        strong { color: $pca-text; font-weight: 600; }
+    }
+
+    // "View Full Record" sits on the card floor.
+    .card-body > :last-child { margin-top: auto; }
+}
+
+// ===========================================================================
+// 11. ITEM PAGE
+// ===========================================================================
+
+.breadcrumb {
+    background: transparent;
+    padding: 0;
+    margin-bottom: $pca-space-4;
+    font-size: .9rem;
+
+    .breadcrumb-item {
+        a { color: $pca-text-muted !important; text-decoration: none; }
+        a:hover { color: $pca-blue !important; }
+
+        &.active { color: $pca-navy !important; font-weight: 500; }
+    }
+}
+
+// The small format label above the title ("RECORD").
+#item-format {
+    color: $pca-blue;
+    font-size: .75rem !important;
+    font-weight: 600;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: $pca-space-1 !important;
+}
+
+#item-title,
+.item-title { @include pca-heading(1.75rem, 700); margin-bottom: $pca-space-5; }
+
+// item-js renders metadata as <dl><dt class="field"><dd class="field-value">.
+// Lay it out as a real two-column metadata sheet with row rules.
+#item-metadata {
+    @include pca-surface($pca-r-card, $pca-shadow-xs);
+    padding: $pca-space-2 $pca-space-5;
+    margin-bottom: $pca-space-5;
+
+    dl {
+        display: grid;
+        grid-template-columns: minmax(9rem, 15rem) 1fr;
+        margin: 0;
+    }
+
+    dt.field {
+        grid-column: 1;
+        color: $pca-navy;
+        font-weight: 600;
+        font-size: .9rem;
+        padding: $pca-space-3 $pca-space-4 $pca-space-3 0;
+    }
+
+    dd.field-value {
+        grid-column: 2;
+        color: $pca-text-muted;
+        margin: 0;
+        padding: $pca-space-3 0;
+        overflow-wrap: anywhere;
+    }
+
+    // Row rules, skipping the first pair.
+    dt.field:not(:first-of-type),
+    dt.field:not(:first-of-type) + dd.field-value { border-top: 1px solid $pca-border-soft; }
+
+    // Browse links render as .btn.btn-link; make them chips like on browse.
+    dd.field-value .btn-link {
+        @include pca-chip($pca-wash-07, $pca-blue);
+        margin: .15rem .25rem .15rem 0;
+        padding: $pca-space-1 $pca-space-3;
+        text-decoration: none;
+    }
+
+    // Plain external links stay as links, not chips.
+    dd.field-value > a:not(.btn) { overflow-wrap: anywhere; }
+}
+
+@media (max-width: 575.98px) {
+    #item-metadata {
+        dl { grid-template-columns: 1fr; }
+
+        dt.field { padding-bottom: 0; border-top: 1px solid $pca-border-soft; }
+        dt.field:first-of-type { border-top: 0; }
+        dt.field + dd.field-value { border-top: 0; padding-top: $pca-space-1; }
+    }
+}
+
+// Back-to-browse and the prev/next arrows.
+#browse-buttons {
+    margin: $pca-space-5 0;
+
+    .btn { border-radius: $pca-r-btn; }
+}
+
+#item-nav {
+    // These float at the far edges of the viewport; a circular control reads
+    // as a deliberate affordance rather than a stray box.
+    .btn,
+    a {
+        align-items: center;
+        border-radius: 50%;
+        display: inline-flex;
+        height: 44px;
+        width: 44px;
+        justify-content: center;
+        padding: 0;
+        background-color: $pca-surface;
+        border: 1px solid $pca-border;
+        box-shadow: $pca-shadow-xs;
+        color: $pca-blue;
+        transition: all $pca-ease;
+
+        &:hover {
+            background-color: $pca-blue;
+            border-color: $pca-blue;
+            color: #fff;
+            box-shadow: $pca-shadow-md;
+        }
+    }
+}
+
+// Loading spinner while item-js fetches the record.
+#loading .spinner-border { color: $pca-blue !important; }
+
+// ===========================================================================
+// 12. CLOUD PAGES  (subjects / locations)
+// ===========================================================================
+
+// cloud-js emits <a class="btn btn-outline-primary m-2 tagcloudN">, where N
+// encodes term frequency. _pages.scss maps N to 0.4em-3.0em; at a 1rem base
+// the low end lands near 6px, which is unreadable. Recompress the ramp into a
+// legible range while keeping frequency legible as size.
+.tagcloud0  { font-size: .85rem; }
+.tagcloud1  { font-size: .92rem; }
+.tagcloud2  { font-size: 1rem; }
+.tagcloud3  { font-size: 1.1rem; }
+.tagcloud4  { font-size: 1.25rem; }
+.tagcloud5  { font-size: 1.4rem; }
+.tagcloud6  { font-size: 1.6rem; }
+.tagcloud7  { font-size: 1.8rem; }
+.tagcloud8  { font-size: 2rem; }
+.tagcloud9  { font-size: 2.2rem; }
+.tagcloud10 { font-size: 2.45rem; }
+
+// The container id carries the field names, e.g. #cloud-div-subject.
+[id^="cloud-div"] {
+    background-color: $pca-surface !important;
+    border: 1px solid $pca-border !important;
+    border-radius: $pca-r-card !important;
+    box-shadow: $pca-shadow-sm;
+    padding: $pca-space-5 !important;
+    line-height: 2.1;
+
+    // Deliberately no font-size here: the tagcloud classes own it.
+    .btn {
+        background-color: $pca-wash-07;
+        border: 1px solid transparent;
+        border-radius: $pca-r-pill;
+        color: $pca-blue;
+        font-weight: 500;
+        line-height: 1.35;
+        margin: .2rem !important;
+        padding: .18em .62em;      // em, so padding tracks term size
+        vertical-align: middle;
+        transition: background-color $pca-ease, color $pca-ease, transform $pca-ease-fast;
 
         &:hover,
         &:focus {
-            color: $primary;
-            background-color: rgba(0, 0, 0, 0.05);
+            background-color: $pca-blue;
+            border-color: $pca-blue;
+            color: #fff;
+            transform: translateY(-1px);
         }
+    }
+}
 
-        &.active {
-            color: $primary;
-            font-weight: 700;
+// ===========================================================================
+// 13. TABLES / DATA PAGE
+// ===========================================================================
+
+.table {
+    color: $pca-text;
+    margin-bottom: 0;
+
+    > thead {
+        th {
+            background-color: $pca-wash-07;
+            color: $pca-navy;
+            font-weight: 600;
+            white-space: nowrap;
+            border-bottom: 2px solid $pca-border;
         }
     }
 
-    .dropdown-menu { border-color: $archive-border; }
-}
+    > tbody {
+        tr {
+            border-color: $pca-border-soft;
+            transition: background-color $pca-ease-fast;
 
-/* ---------- Buttons & cards ---------- */
+            &:hover { background-color: rgba(74, 144, 226, .06); }
+        }
 
-.btn {
-    text-transform: none;
-    border-radius: 8px;
-    padding: 8px 24px;
-}
-
-.btn-sm { padding: 4px 14px; }
-
-.card {
-    border-radius: 12px;
-    border-color: $archive-border;
-    transition: transform 0.3s, box-shadow 0.3s;
-
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 8px 24px rgba(16, 42, 67, 0.12);
+        td { vertical-align: top; }
     }
 }
 
-a { color: $link-color; }
-
-/* ---------- Home banner ---------- */
-
-#home-banner,
-.home-banner {
-    h1, .h1 { color: #fff; }
-    color: #fff;
+.table-responsive,
+#datatable_wrapper > .row:has(table),
+.dataTables_scroll {
+    @include pca-surface($pca-r-card, $pca-shadow-xs);
+    overflow-x: auto;
 }
 
-/* ---------- Footer: light grey, centered credits ---------- */
+// Round the table's own corners so it sits flush inside the shell.
+.table-responsive > .table,
+.dataTables_wrapper .table {
+    margin-bottom: 0;
 
-#site-footer {
-    background-color: $archive-footer-bg;
-    border-top: 1px solid $archive-border;
-    color: $archive-text-muted;
+    thead tr:first-child th:first-child { border-top-left-radius: $pca-r-card; }
+    thead tr:first-child th:last-child  { border-top-right-radius: $pca-r-card; }
+}
 
-    .border-bottom { border-color: $archive-border !important; }
+.dataTables_wrapper {
+    padding: $pca-space-4 0;
 
-    .footer-title {
-        color: $archive-text;
+    .dataTables_filter input,
+    .dataTables_length select {
+        border: 1px solid $pca-border;
+        border-radius: $pca-r-btn;
+        padding: .35rem .7rem;
+        margin-left: $pca-space-2;
+
+        &:focus { @include pca-focus-ring; outline-offset: 0; }
+    }
+
+    .dataTables_info { color: $pca-text-muted; font-size: .9rem; }
+
+    .dataTables_paginate {
+        .paginate_button {
+            border-radius: $pca-r-btn !important;
+            border: 1px solid transparent !important;
+            color: $pca-blue !important;
+            margin: 0 .1rem;
+
+            &:hover {
+                background: $pca-wash-07 !important;
+                border-color: $pca-border !important;
+                color: $pca-navy !important;
+            }
+
+            &.current {
+                background: $pca-blue !important;
+                border-color: $pca-blue !important;
+                color: #fff !important;
+            }
+
+            &.disabled { color: $pca-slate !important; opacity: .5; }
+        }
+    }
+}
+
+// ===========================================================================
+// 13b. TIMELINE
+// ===========================================================================
+
+#timeline {
+    .card {
+        @include pca-lift;
+        height: 100%;
+
+        .card-body { padding: $pca-space-4; }
+
+        .h5 {
+            @include pca-heading(1rem, 600);
+
+            a, &.text-dark { color: $pca-navy !important; }
+        }
+    }
+
+    // Same oversized format icons as browse; reuse the shared treatment.
+    .card img:not(.card-img-top):not(.img-thumbnail) { @include pca-format-icon(52px); }
+
+    .timeline-thumb {
+        border: 1px solid $pca-border;
+        border-radius: $pca-r-card;
+        padding: 0;
+        background: $pca-surface;
+    }
+}
+
+// Sticky year navigation.
+#year-nav {
+    margin-bottom: $pca-space-5;
+
+    .dropdown-menu { @include pca-surface($pca-r-card, $pca-shadow-md); padding: $pca-space-2; }
+
+    .dropdown-item {
+        border-radius: $pca-r-btn;
+        padding: $pca-space-2 $pca-space-3;
+
+        &:hover { background-color: $pca-wash-07; color: $pca-blue; }
+    }
+}
+
+// Year headings down the timeline.
+[id^="y1"], [id^="y2"] {
+    &:is(h2, h3) {
+        border-top: 1px solid $pca-border;
+        padding-top: $pca-space-5;
+        margin-top: $pca-space-6;
+        scroll-margin-top: 5rem;
+    }
+}
+
+// ===========================================================================
+// 14. SEARCH RESULTS
+// ===========================================================================
+
+#lunrResults {
+    margin-top: $pca-space-5;
+
+    .table { @include pca-surface($pca-r-card, $pca-shadow-xs); overflow: hidden; }
+
+    a { font-weight: 500; }
+}
+
+#lunrSearch.form-control { border-radius: $pca-r-btn 0 0 $pca-r-btn; }
+
+#search-results,
+.search-results {
+    .search-result {
+        @include pca-surface($pca-r-card, $pca-shadow-xs);
+        @include pca-lift(-2px);
+        padding: $pca-space-4 $pca-space-5;
+        margin-bottom: $pca-space-3;
+    }
+
+    mark { background: rgba(74, 144, 226, .25); padding: 0 .15rem; border-radius: 3px; }
+}
+
+// ===========================================================================
+// 15. FEATURE COMPONENTS  (about page includes)
+// ===========================================================================
+
+.alert {
+    border: 1px solid $pca-border;
+    border-radius: $pca-r-card;
+    box-shadow: $pca-shadow-xs;
+}
+
+.accordion {
+    .accordion-item {
+        border: 1px solid $pca-border;
+        border-radius: $pca-r-card !important;
+        overflow: hidden;
+        margin-bottom: $pca-space-2;
+    }
+
+    .accordion-button {
+        @include pca-heading(1rem, 600);
+        background-color: $pca-surface;
+        padding: $pca-space-3 $pca-space-4;
+
+        &:not(.collapsed) { background-color: $pca-wash-07; color: $pca-navy; box-shadow: none; }
+        &:focus { box-shadow: none; @include pca-focus-ring; }
+    }
+}
+
+// Jumbotron feature block, given the same treatment as the home hero.
+.jumbotron.feature {
+    // The include hardcodes background-color #e9ecef as the fallback behind
+    // the feature image; keep that fallback on-palette.
+    background-color: $pca-bg;
+    border: 0 !important;
+    border-radius: $pca-r-card;
+    padding: $pca-space-7 $pca-space-6;
+    overflow: hidden;
+    box-shadow: $pca-shadow-md;
+    margin-bottom: $pca-space-6;
+
+    .jumbo-title-box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .bg-dark {
+        background-color: rgba(26, 54, 93, .90) !important;
+        @include pca-grid-texture(.16);
+        padding: $pca-space-6 $pca-space-5 !important;
+        width: 100%;
+    }
+
+    .display-4 {
+        color: #fff;
+        font-size: clamp(1.5rem, 3.2vw, 2.5rem);
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        text-shadow: 0 2px 12px rgba(0, 0, 0, .35);
+        margin-bottom: $pca-space-2;
+    }
+
+    .jumbo-tagline {
+        color: rgba(255, 255, 255, .88);
+        font-weight: 300;
+        margin-bottom: 0;
+    }
+}
+
+// Sticky "Contents:" bar on the About page.
+.about-nav {
+    @include pca-surface($pca-r-pill, $pca-shadow-sm);
+    padding: $pca-space-3 $pca-space-5 !important;
+    margin-bottom: $pca-space-6;
+    color: $pca-text-muted;
+    font-weight: 500;
+    top: $pca-space-4;
+    z-index: 5;
+
+    a {
+        color: $pca-blue;
         text-decoration: none;
 
-        &:hover { color: $primary; }
+        &:hover { color: $pca-navy; text-decoration: underline; }
     }
 
-    .footer-muted { color: $archive-text-muted; }
+}
 
+// _pages.scss gives every About section heading `border-top: 1px dotted black`
+// plus 100px of padding to clear the sticky contents bar. Soften the rule and
+// use scroll-margin for the anchor offset instead of dead padding.
+.about-contents > h2 {
+    border-top: 1px solid $pca-border;
+    padding-top: $pca-space-6 !important;
+    margin-top: $pca-space-6;
+    scroll-margin-top: 6rem;
+}
+
+.figure-caption, figcaption { color: $pca-text-muted; font-size: .875rem; }
+
+// ===========================================================================
+// 15b. NOT FOUND
+// ===========================================================================
+
+#not-found {
+    .display-1 {
+        color: $pca-blue;
+        font-weight: 700;
+        letter-spacing: -0.04em;
+        line-height: 1;
+        opacity: .22;
+    }
+
+    .btn { margin: $pca-space-1; }
+}
+
+// ===========================================================================
+// 16. MODAL
+// ===========================================================================
+
+.modal-content {
+    border: none;
+    border-radius: $pca-r-lg;
+    box-shadow: $pca-shadow-lg;
+}
+
+.modal-header {
+    border-bottom: 1px solid $pca-border;
+    padding: $pca-space-4 $pca-space-5;
+
+    .modal-title { @include pca-heading(1.15rem, 600); }
+}
+
+.modal-body   { padding: $pca-space-5; }
+.modal-footer { border-top: 1px solid $pca-border; padding: $pca-space-3 $pca-space-5; }
+
+// ===========================================================================
+// 17. FOOTER
+// ===========================================================================
+
+#site-footer {
+    background-color: $pca-surface-alt;
+    border-top: 1px solid $pca-border;
+    color: $pca-text-muted;
+
+    .border-bottom { border-color: $pca-border !important; }
+
+    .footer-title {
+        @include pca-heading(1.15rem, 600);
+        text-decoration: none;
+
+        &:hover { color: $pca-blue; text-decoration: none; }
+    }
+
+    .footer-muted { color: $pca-text-muted; }
     .footer-heart { color: #d32f2f; }
 
     #footer-nav .nav-link {
-        color: $archive-text-muted;
-        padding: 0.25rem 0.75rem;
+        @include pca-chip(transparent, $pca-text-muted);
+        font-size: .92rem;
+        padding: $pca-space-1 $pca-space-3;
 
-        &:hover { color: $primary; }
-
-        &.active {
-            color: #fff;
-            background-color: $primary;
-            border-radius: 20px;
-        }
+        &.active { background-color: $pca-blue; color: #fff; }
     }
 
-    #footer-credits img { max-height: 30px; }
-
+    #footer-credits img { max-height: 28px; opacity: .75; }
     #footer-logo { max-height: 60px; }
+}
+
+// ===========================================================================
+// 18. SCROLL TO TOP
+// ===========================================================================
+
+#to-top-btn,
+#scroll-to-top a,
+.back-to-top {
+    border-radius: $pca-r-btn;
+    box-shadow: $pca-shadow-md;
+    background-color: $pca-blue;
+    border-color: $pca-blue;
+    color: #fff;
+    transition: background-color $pca-ease, transform $pca-ease-fast;
+
+    &:hover { background-color: $pca-navy; transform: translateY(-2px); }
+}
+
+// ===========================================================================
+// 19. RESPONSIVE
+// ===========================================================================
+
+@media (max-width: 991.98px) {
+    .navbar .nav-link { padding: $pca-space-2 $pca-space-3; }
+    #home-title-box > .bg-dark { padding: $pca-space-6 $pca-space-5 !important; }
+}
+
+@media (max-width: 575.98px) {
+    body { font-size: .96rem; }
+    h1, .h1 { font-size: 1.75rem; }
+    .card .card-body { padding: $pca-space-4; }
+    #home-title-box > .bg-dark { padding: $pca-space-5 $pca-space-4 !important; }
+    .btn { padding: .45rem 1.1rem; }
+}
+
+// ===========================================================================
+// 20. PRINT
+// ===========================================================================
+
+@media print {
+    .navbar, #site-footer, #to-top-btn, .btn { display: none !important; }
+    body { background: #fff; color: #000; }
+    .card { box-shadow: none; border-color: #ccc; }
 }

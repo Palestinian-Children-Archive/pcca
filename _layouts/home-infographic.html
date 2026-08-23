@@ -7,16 +7,28 @@ layout: page
   <div class="col-md-8">
 
     {% include index/description.html %}
-    {% include index/carousel.html title="Sample Items" height="300" %}
-  
+
+    {%- comment -%}
+      The carousel and the Locations cloud are omitted deliberately: every
+      record in this collection is format "record" pointing at a remote
+      archive, so there are no local images to feature, and the metadata has
+      no location column for a cloud to draw on. Both rendered as empty cards.
+    {%- endcomment -%}
+    {% include index/featured-terms.html field="subject" title="Top Subjects" btn-color="primary" %}
+
   </div>
   <div class="col-md-4">  
 
     {% include index/time.html %}
 
-    {% include index/featured-terms.html field="subject" title="Top Subjects" btn-color="primary" %}
-
-    {% include index/featured-terms.html field="location" title="Locations" btn-color="outline-secondary" %}
+    {%- comment -%}
+      No featured-terms card for lcsh: the include counts every unique term
+      with a where_exp scan across all terms, so its cost is
+      O(unique x total). subject is 785 unique terms; lcsh is 2901 across
+      ~50k instances, which pushed the site build past ten minutes and would
+      exceed the GitHub Pages build timeout. lcsh stays searchable and is
+      shown in full on item pages.
+    {%- endcomment -%}
 
     {% include index/objects.html %}
 
