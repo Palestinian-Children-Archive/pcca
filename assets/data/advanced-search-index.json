@@ -1,0 +1,12 @@
+---
+permalink: /assets/data/advanced-search-index.json
+# Purpose-built index for the Advanced Search page. The generated
+# metadata.json carries every field and runs to ~7.4 MB, which is a lot to
+# pull down just to filter; this carries only the searchable and displayable
+# fields, with short keys. The link field is deliberately absent: results
+# link to the item page, not out to the holding institution.
+---
+{%- assign items = site.data[site.metadata] | where_exp: 'item', 'item.objectid' -%}
+[{% for i in items %}{% unless forloop.first %},{% endunless %}
+{"id":{{ i.objectid | jsonify }},"t":{{ i.title | default: "" | jsonify }},"d":{{ i.date | default: "" | jsonify }},"s":{{ i.subject | default: "" | jsonify }},"l":{{ i.lcsh | default: "" | jsonify }},"g":{{ i.language | default: "" | jsonify }},"o":{{ i.origin | default: "" | jsonify }},"r":{{ i.resource_type | default: "" | jsonify }}}
+{%- endfor %}]

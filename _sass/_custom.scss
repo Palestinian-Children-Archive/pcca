@@ -3,16 +3,19 @@
    Palestinian Children and Community Archive — collection site design system
    ===========================================================================
 
-   Tracks the main archive (https://palestinian-children-archive.github.io/),
-   whose MUI theme defines:
+   Tracks the main archive (https://palestinian-children-archive.github.io/).
 
-     primary    #2C5282   light #4A90E2   dark #1A365D   darker #102A43
-     secondary  #718096
-     background #F7FAFC   paper #FFFFFF
-     text       #2D3748 / #4A5568
-     Roboto; 8px button radius; 12px card radius; flat elevation-0 app bar;
-     cards lift 4px on hover; hero is a dark-scrimmed photo behind a
-     primary.dark panel; the menu drawer adds a 20px grid pattern.
+   Note: that site ships a src/theme.ts declaring a navy palette, but nothing
+   imports it and there is no ThemeProvider, so it renders MUI's defaults.
+   These values are measured from the running site, not read from theme.ts:
+
+     primary    #1976D2   light #42A5F5   dark #1565C0
+     app bar / footer  #F5F5F5, black title text
+     body text  rgba(0,0,0,.6)
+     body font  Inter (from index.css); headings Roboto (MUI default)
+     flat elevation-0 app bar; cards lift 4px on hover; hero is a
+     dark-scrimmed photo behind a primary.dark panel; the menu drawer
+     adds a 20px grid pattern.
 
    Structure: tokens -> mixins -> base -> components. Components are composed
    from the mixins so radii, shadows, motion and focus behaviour stay in one
@@ -25,27 +28,27 @@
 // ===========================================================================
 
 // -- colour ----------------------------------------------------------------
-$pca-navy-darkest: #102A43;
-$pca-navy:         #1A365D;
-$pca-navy-hover:   #16304F;
-$pca-blue:         #2C5282;
-$pca-blue-hover:   #24466F;
-$pca-blue-light:   #4A90E2;
-$pca-slate:        #718096;
-$pca-slate-light:  #A0AEC0;   // archive secondary.light
-$pca-bg:           #F7FAFC;
+$pca-navy-darkest: #0D47A1;   // archive primary, darkest step
+$pca-navy:         #1565C0;   // archive primary.dark (menu drawer)
+$pca-navy-hover:   #114F9E;
+$pca-blue:         #1976D2;   // archive primary.main (feature cards)
+$pca-blue-hover:   #1565C0;
+$pca-blue-light:   #42A5F5;   // archive primary.light
+$pca-slate:        #757575;
+$pca-slate-light:  #9E9E9E;
+$pca-bg:           #FAFAFA;
 $pca-surface:      #FFFFFF;
-$pca-surface-alt:  #F5F5F5;
-$pca-text:         #2D3748;
-$pca-text-muted:   #4A5568;
-$pca-border:       #E2E8F0;
-$pca-border-soft:  #EDF2F7;
+$pca-surface-alt:  #F5F5F5;   // archive app bar + footer
+$pca-text:         #212121;
+$pca-text-muted:   #616161;
+$pca-border:       #E0E0E0;
+$pca-border-soft:  #EEEEEE;
 
 // Translucent brand washes, used for hovers and tinted tiles.
-$pca-wash-04: rgba(44, 82, 130, .04);
-$pca-wash-07: rgba(44, 82, 130, .07);
-$pca-wash-12: rgba(44, 82, 130, .12);
-$pca-wash-18: rgba(44, 82, 130, .18);
+$pca-wash-04: rgba(25, 118, 210, .04);
+$pca-wash-07: rgba(25, 118, 210, .07);
+$pca-wash-12: rgba(25, 118, 210, .12);
+$pca-wash-18: rgba(25, 118, 210, .18);
 
 // -- radius ----------------------------------------------------------------
 $pca-r-sm:   6px;
@@ -55,10 +58,10 @@ $pca-r-lg:   16px;
 $pca-r-pill: 999px;
 
 // -- elevation -------------------------------------------------------------
-$pca-shadow-xs: 0 1px 2px rgba(16, 42, 67, .05);
-$pca-shadow-sm: 0 1px 3px rgba(16, 42, 67, .07);
-$pca-shadow-md: 0 4px 14px rgba(16, 42, 67, .09);
-$pca-shadow-lg: 0 14px 32px rgba(16, 42, 67, .16);
+$pca-shadow-xs: 0 1px 2px rgba(13, 71, 161, .05);
+$pca-shadow-sm: 0 1px 3px rgba(13, 71, 161, .07);
+$pca-shadow-md: 0 4px 14px rgba(13, 71, 161, .09);
+$pca-shadow-lg: 0 14px 32px rgba(13, 71, 161, .16);
 
 // -- motion ----------------------------------------------------------------
 $pca-ease:      .25s cubic-bezier(.4, 0, .2, 1);
@@ -66,7 +69,8 @@ $pca-ease-fast: .15s cubic-bezier(.4, 0, .2, 1);
 $pca-lift:      -4px;   // the archive's card hover distance
 
 // -- type ------------------------------------------------------------------
-$pca-font: Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+$pca-font:         Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;   // archive body
+$pca-font-heading: Roboto, Helvetica, Arial, sans-serif;                     // archive headings (MUI default)
 
 // -- spacing ---------------------------------------------------------------
 $pca-space-1: .25rem;
@@ -104,7 +108,7 @@ $pca-space-7: 3rem;
     &:hover {
         transform: translateY($distance);
         box-shadow: $pca-shadow-lg;
-        border-color: rgba(74, 144, 226, .45);
+        border-color: rgba(66, 165, 245, .45);
     }
 }
 
@@ -132,7 +136,7 @@ $pca-space-7: 3rem;
 }
 
 /// One consistent, visible focus ring everywhere.
-@mixin pca-focus-ring($color: rgba(74, 144, 226, .5)) {
+@mixin pca-focus-ring($color: rgba(66, 165, 245, .5)) {
     outline: 3px solid $color;
     outline-offset: 2px;
 }
@@ -140,7 +144,7 @@ $pca-space-7: 3rem;
 /// Section heading with the archive's tight letter-spacing.
 @mixin pca-heading($size: 1.15rem, $weight: 600) {
     color: $pca-navy;
-    font-family: $pca-font;
+    font-family: $pca-font-heading;
     font-size: $size;
     font-weight: $weight;
     letter-spacing: -0.01em;
@@ -249,7 +253,7 @@ blockquote {
 
 img { max-width: 100%; }
 
-::selection { background: rgba(74, 144, 226, .25); }
+::selection { background: rgba(66, 165, 245, .25); }
 
 :focus-visible { @include pca-focus-ring; }
 
@@ -302,8 +306,12 @@ main { padding-bottom: $pca-space-7; }
         &:hover,
         &:focus { color: $pca-blue; background-color: $pca-wash-07; }
 
-        &.active { color: $pca-blue; font-weight: 700; background-color: $pca-wash-12; }
+        // Bootstrap's .navbar-light .navbar-nav .nav-link.active is more
+        // specific than a bare .navbar .nav-link.active, so match its depth.
+        &.active { font-weight: 700; background-color: $pca-wash-12; }
     }
+
+    .navbar-nav .nav-link.active { color: $pca-blue; }
 
     .navbar-toggler {
         border: 1px solid $pca-border;
@@ -356,7 +364,7 @@ main { padding-bottom: $pca-space-7; }
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(16, 42, 67, .40) 0%, rgba(16, 42, 67, .62) 100%);
+        background: linear-gradient(180deg, rgba(13, 71, 161, .40) 0%, rgba(13, 71, 161, .62) 100%);
     }
 
     > * { position: relative; z-index: 1; }
@@ -369,7 +377,7 @@ main { padding-bottom: $pca-space-7; }
 
     // Bootstrap renders a .bg-dark band here; restyle it into the archive panel.
     > .bg-dark {
-        background-color: rgba(26, 54, 93, .90) !important;
+        background-color: rgba(21, 101, 192, .90) !important;
         @include pca-grid-texture(.16);
         max-width: 62rem;
         margin: 0 auto;
@@ -462,7 +470,7 @@ main { padding-bottom: $pca-space-7; }
 .btn-lg  { padding: .7rem 2rem;   font-size: 1.05rem; }
 
 .btn-primary {
-    box-shadow: 0 1px 2px rgba(26, 54, 93, .2);
+    box-shadow: 0 1px 2px rgba(21, 101, 192, .2);
 
     &:hover { box-shadow: $pca-shadow-md; transform: translateY(-1px); }
 }
@@ -537,7 +545,7 @@ main { padding-bottom: $pca-space-7; }
 
     &:focus {
         border-color: $pca-blue-light;
-        box-shadow: 0 0 0 .2rem rgba(74, 144, 226, .18);
+        box-shadow: 0 0 0 .2rem rgba(66, 165, 245, .18);
     }
 }
 
@@ -843,7 +851,7 @@ main { padding-bottom: $pca-space-7; }
             border-color: $pca-border-soft;
             transition: background-color $pca-ease-fast;
 
-            &:hover { background-color: rgba(74, 144, 226, .06); }
+            &:hover { background-color: rgba(66, 165, 245, .06); }
         }
 
         td { vertical-align: top; }
@@ -959,6 +967,48 @@ main { padding-bottom: $pca-space-7; }
 }
 
 // ===========================================================================
+// 13c. ADVANCED SEARCH
+// ===========================================================================
+
+#adv-form {
+    .form-label,
+    legend.form-label {
+        color: $pca-text;
+        font-size: .9rem;
+        font-weight: 500;
+        margin-bottom: $pca-space-1;
+    }
+
+    legend.form-label { float: none; width: auto; }
+
+    .input-group-text {
+        background-color: $pca-wash-04;
+        border-color: $pca-border;
+        color: $pca-text-muted;
+        font-size: .9rem;
+    }
+
+    // Year inputs sit between the addon, so square off their inner corners.
+    #f-from { border-radius: $pca-r-btn 0 0 $pca-r-btn; }
+    #f-to   { border-radius: 0 $pca-r-btn $pca-r-btn 0; }
+}
+
+#adv-status { font-size: .88rem; }
+
+#adv-summary .h5 { @include pca-heading(1.15rem, 600); }
+
+#adv-results .adv-subjects {
+    color: $pca-text-muted;
+    font-size: .82rem;
+    margin-top: $pca-space-2;
+    margin-bottom: 0;
+}
+
+#adv-pager {
+    .btn { min-width: 8rem; }
+}
+
+// ===========================================================================
 // 14. SEARCH RESULTS
 // ===========================================================================
 
@@ -981,7 +1031,7 @@ main { padding-bottom: $pca-space-7; }
         margin-bottom: $pca-space-3;
     }
 
-    mark { background: rgba(74, 144, 226, .25); padding: 0 .15rem; border-radius: 3px; }
+    mark { background: rgba(66, 165, 245, .25); padding: 0 .15rem; border-radius: 3px; }
 }
 
 // ===========================================================================
@@ -1031,7 +1081,7 @@ main { padding-bottom: $pca-space-7; }
     }
 
     .bg-dark {
-        background-color: rgba(26, 54, 93, .90) !important;
+        background-color: rgba(21, 101, 192, .90) !important;
         @include pca-grid-texture(.16);
         padding: $pca-space-6 $pca-space-5 !important;
         width: 100%;

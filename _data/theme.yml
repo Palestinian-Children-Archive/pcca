@@ -23,7 +23,7 @@ browse-buttons: true # true/false, adds previous/next arrows to item pages
 ##########
 # SUBJECTS PAGE
 #
-subjects-fields: subject # set the field to be featured in the cloud (if left blank, none will be generated)
+subjects-fields: # set the field to be featured in the cloud (if left blank, none will be generated)
 subjects-min: 3 # min size for subject cloud, too many terms = slow load time!
 subjects-stopwords: # boxers;boxing;boxer # set of subjects separated by ;, e.g. boxers;boxing
 
@@ -95,10 +95,10 @@ bootswatch: # leave blank or comment out for plain bootstrap
 
 # THEME FONTS
 base-font-size: 1rem
-text-color: "#2D3748"
-link-color: "#2C5282"
-base-font-family: Roboto
-font-cdn: <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+text-color: "#212121"
+link-color: "#1976D2"
+base-font-family: Inter
+font-cdn: <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@400;500;700&display=swap">
 
 # THEME ICONS [optional!]
 # cb-gh uses Bootstrap Icons, https://icons.getbootstrap.com/
