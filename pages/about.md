@@ -12,7 +12,7 @@ credits: true
 
 ## About the Collection
 
-This is the dataset behind the [Palestinian Children and Community Archive](https://palestinian-children-archive.github.io/), a project documenting Palestinian childhood during the British Mandate of Palestine.
+This is the dataset behind the [Palestinian Childhood Archive](https://palestinianchildhoodarchive.org/), a project documenting Palestinian childhood during the British Mandate of Palestine.
 
 It gathers **{{ site.data[site.metadata] | size }} records** describing newspapers, government and court papers, correspondence, photographs, maps, and recorded interviews held by archives and libraries around the world. Dated material in the collection runs from the 1830s to the mid-twentieth century, concentrated on the Mandate period.
 

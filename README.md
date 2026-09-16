@@ -1,8 +1,8 @@
-# Palestinian Children and Community Archive — Collection Data
+# Palestinian Childhood Archive — Collection Data
 
-The digital collection site for the [Palestinian Children and Community Archive](https://palestinian-children-archive.github.io/), publishing the dataset that documents Palestinian childhood during the British Mandate of Palestine.
+The digital collection site for the [Palestinian Childhood Archive](https://palestinianchildhoodarchive.org/), publishing the dataset that documents Palestinian childhood during the British Mandate of Palestine.
 
-**Live site:** <https://palestinian-children-archive.github.io/pcca/>
+**Live site:** <https://palestinianchildhoodarchive.org/pcca/>
 
 The two sites link to each other: the main archive links here from its menu, home page, and footer, and every page here links back via the "Main Archive" nav item.
 
