@@ -9,7 +9,7 @@
 #
 # url is site domain, full URL to the production location of your collection
 # on GitHub Pages follows the pattern username.github.io
-url: https://palestinian-children-archive.github.io
+url: https://palestinianchildhoodarchive.org
 # baseurl is path to location on the domain if necessary e.g. /digital/hjccc
 # on GitHub Pages it is your github repository's name prefixed with a /
 baseurl: /pcca
@@ -20,9 +20,9 @@ source-code: https://github.com/Palestinian-Children-Archive/pcca
 # SITE SETTINGS
 #
 # title of site appears in banner
-title: Palestinian Children and Community Archive Data 
+title: Palestinian Childhood Archive
 # tagline, a short phrase that will appear throughout the site in the top banner
-tagline: Dataset for the Palestinian Children and Community Archive
+tagline: Collection records and metadata
 # description appears in meta tags and other locations
 # this description might appear in search result lists, keep around 160 characters max
 description: This is the initial dataset for Palestinian childhood during the British Mandate. 
@@ -41,8 +41,8 @@ metadata: pcca_processed
 # Site/Organization Branding 
 #   Uncomment these and enter information for your organization (replacing the CDIL links and name below) if you'd like to brand your site with a logo
 #
-organization-name: "Palestinian Children and Community Archive"
-organization-link: https://palestinian-children-archive.github.io/
+organization-name: "Palestinian Childhood Archive"
+organization-link: https://palestinianchildhoodarchive.org/
 # organization-logo-banner:
 # organization-logo-nav:
 

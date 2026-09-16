@@ -12,7 +12,7 @@ credits: true
 
 ## About the Collection
 
-This is the dataset behind the [Palestinian Children and Community Archive](https://palestinian-children-archive.github.io/), a project documenting Palestinian childhood during the British Mandate of Palestine.
+This is the dataset behind the [Palestinian Childhood Archive](https://palestinianchildhoodarchive.org/), a project documenting Palestinian childhood during the British Mandate of Palestine.
 
 It gathers **{{ site.data[site.metadata] | size }} records** describing newspapers, government and court papers, correspondence, photographs, maps, and recorded interviews held by archives and libraries around the world. Dated material in the collection runs from the 1830s to the mid-twentieth century, concentrated on the Mandate period.
 
@@ -21,11 +21,11 @@ Each record is a catalogue entry rather than a copy of the item itself. Records 
 ## Using the Collection
 
 - **[Browse]({{ '/browse.html' | relative_url }})** — page through every record, filter by keyword, and sort by title or date.
-- **[Subjects]({{ '/subjects.html' | relative_url }})** — a term cloud sized by how often each subject appears; select a term to see its records.
+- **[Advanced Search]({{ '/advanced-search.html' | relative_url }})** — search individual fields (title, subject, Library of Congress Subject Heading, source, language, resource type) and narrow by year range. Fields combine, and a search can be linked or bookmarked.
 - **[Timeline]({{ '/timeline.html' | relative_url }})** — records arranged by date.
 - **[Data]({{ '/data.html' | relative_url }})** — the full metadata as a sortable table, downloadable as CSV, JSON, or Excel.
 
-The search box in the navigation bar searches titles, dates, subjects, summaries, and subject headings.
+The search box in the navigation bar searches across titles, dates, subjects, summaries, and subject headings at once.
 
 ## Sources and Rights
 

@@ -1,0 +1,264 @@
+---
+layout: page
+---
+
+<h1 class="mb-2">Advanced Search</h1>
+<p class="text-muted mb-4">
+  Combine any of the fields below. Empty fields are ignored, and a record must
+  match every field you fill in.
+</p>
+
+<form id="adv-form" class="card mb-4" autocomplete="off">
+  <div class="card-body">
+    <div class="row g-3">
+
+      <div class="col-md-6">
+        <label class="form-label" for="f-title">Title contains</label>
+        <input class="form-control" type="search" id="f-title" name="t">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="f-subject">Subject contains</label>
+        <input class="form-control" type="search" id="f-subject" name="s">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="f-lcsh">Library of Congress Subject Heading contains</label>
+        <input class="form-control" type="search" id="f-lcsh" name="l">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label" for="f-origin">Source</label>
+        <select class="form-select" id="f-origin" name="o"><option value="">Any</option></select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label" for="f-language">Language</label>
+        <select class="form-select" id="f-language" name="g"><option value="">Any</option></select>
+      </div>
+
+      <div class="col-md-4">
+        <label class="form-label" for="f-type">Resource type</label>
+        <select class="form-select" id="f-type" name="r"><option value="">Any</option></select>
+      </div>
+
+      <div class="col-md-4">
+        <fieldset>
+          <legend class="form-label">Year range</legend>
+          <div class="input-group">
+            <input class="form-control" type="number" id="f-from" name="from" placeholder="From" aria-label="Year from" min="1700" max="2100" step="1">
+            <span class="input-group-text">to</span>
+            <input class="form-control" type="number" id="f-to" name="to" placeholder="To" aria-label="Year to" min="1700" max="2100" step="1">
+          </div>
+        </fieldset>
+      </div>
+
+    </div>
+
+    <div class="mt-4 d-flex gap-2 align-items-center">
+      <button class="btn btn-primary" type="submit">Search</button>
+      <button class="btn btn-secondary" type="reset" id="adv-reset">Reset</button>
+      <span class="ms-auto text-muted" id="adv-status" aria-live="polite">Loading index&hellip;</span>
+    </div>
+  </div>
+</form>
+
+<div id="adv-summary" class="mb-3"></div>
+<ul id="adv-results" class="result-list"></ul>
+<nav id="adv-pager" class="my-4 text-center"></nav>
+
+<script>
+(function () {
+  "use strict";
+
+  var INDEX_URL = "{{ '/assets/data/advanced-search-index.json' | relative_url }}";
+  var ITEM_URL  = "{{ '/item.html' | relative_url }}";
+  var ICON_BASE = "{{ '/assets/lib/icons/' | relative_url }}";
+
+  // Match Browse, which shows a small format icon beside each row.
+  var ICONS = { text: "file-text", image: "image", map: "map",
+                video: "film", interview: "soundwave" };
+  function iconFor(type) {
+    var key = (type || "").trim().toLowerCase().split(",")[0];
+    return ICON_BASE + (ICONS[key] || "file-earmark") + ".svg";
+  }
+  var PAGE_SIZE = 24;
+
+  var records = [];
+  var matches = [];
+  var page = 0;
+
+  var form    = document.getElementById("adv-form");
+  var status  = document.getElementById("adv-status");
+  var summary = document.getElementById("adv-summary");
+  var results = document.getElementById("adv-results");
+  var pager   = document.getElementById("adv-pager");
+
+  // Dates in this collection are written many ways: 8/2/1930, 1920-1921,
+  // "September 17, 1947", 1950s, "No Date". Pull a plausible four-digit year
+  // off either end rather than trying to parse the whole string.
+  function yearsOf(value) {
+    if (!value) return [];
+    var out = [];
+    [value.slice(0, 4), value.slice(-4)].forEach(function (chunk) {
+      if (/^\d{4}$/.test(chunk)) {
+        var n = +chunk;
+        if (n > 1700 && n < 2100) out.push(n);
+      }
+    });
+    return out;
+  }
+
+  function contains(haystack, needle) {
+    return (haystack || "").toLowerCase().indexOf(needle) !== -1;
+  }
+
+  function readForm() {
+    var d = new FormData(form);
+    var get = function (k) { return (d.get(k) || "").trim().toLowerCase(); };
+    return {
+      t: get("t"), s: get("s"), l: get("l"),
+      o: d.get("o") || "", g: d.get("g") || "", r: d.get("r") || "",
+      from: parseInt(d.get("from"), 10),
+      to: parseInt(d.get("to"), 10)
+    };
+  }
+
+  function isEmpty(q) {
+    return !q.t && !q.s && !q.l && !q.o && !q.g && !q.r &&
+           isNaN(q.from) && isNaN(q.to);
+  }
+
+  function matchesQuery(rec, q) {
+    if (q.t && !contains(rec.t, q.t)) return false;
+    if (q.s && !contains(rec.s, q.s)) return false;
+    if (q.l && !contains(rec.l, q.l)) return false;
+    if (q.o && rec.o !== q.o) return false;
+    if (q.g && rec.g !== q.g) return false;
+    if (q.r && rec.r !== q.r) return false;
+
+    if (!isNaN(q.from) || !isNaN(q.to)) {
+      var ys = yearsOf(rec.d);
+      if (!ys.length) return false;             // undated cannot satisfy a range
+      var lo = Math.min.apply(null, ys), hi = Math.max.apply(null, ys);
+      if (!isNaN(q.from) && hi < q.from) return false;
+      if (!isNaN(q.to)   && lo > q.to)   return false;
+    }
+    return true;
+  }
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function render() {
+    var start = page * PAGE_SIZE;
+    var slice = matches.slice(start, start + PAGE_SIZE);
+    results.style.counterReset = "result " + start;
+
+    results.innerHTML = slice.map(function (r) {
+      var facts = [];
+      if (r.d) facts.push("<strong>Date:</strong> " + esc(r.d));
+      if (r.o) facts.push("<strong>Source:</strong> " + esc(r.o));
+      if (r.g) facts.push("<strong>Language:</strong> " + esc(r.g));
+      return '<li class="result-row">' +
+        '<span class="result-num"></span>' +
+        '<img class="result-icon" src="' + iconFor(r.r) + '" alt="" aria-hidden="true">' +
+        '<div class="result-body">' +
+          (r.r ? '<p class="result-type">' + esc(r.r) + "</p>" : "") +
+          '<h3 class="result-title"><a href="' + ITEM_URL + "?id=" + encodeURIComponent(r.id) + '">' + esc(r.t || "Untitled") + "</a></h3>" +
+          (facts.length ? '<p class="result-meta">' + facts.join("<br>") + "</p>" : "") +
+          (r.s ? '<p class="result-subjects">' + esc(r.s) + "</p>" : "") +
+        "</div>" +
+      "</li>";
+    }).join("");
+
+    var total = Math.ceil(matches.length / PAGE_SIZE);
+    pager.innerHTML = total <= 1 ? "" :
+      '<button class="btn btn-secondary btn-sm" id="adv-prev"' + (page === 0 ? " disabled" : "") + ">&laquo; Previous</button>" +
+      '<span class="mx-3 text-muted">Page ' + (page + 1) + " of " + total + "</span>" +
+      '<button class="btn btn-secondary btn-sm" id="adv-next"' + (page >= total - 1 ? " disabled" : "") + ">Next &raquo;</button>";
+
+    var prev = document.getElementById("adv-prev");
+    var next = document.getElementById("adv-next");
+    if (prev) prev.onclick = function () { page--; render(); scrollUp(); };
+    if (next) next.onclick = function () { page++; render(); scrollUp(); };
+  }
+
+  function scrollUp() {
+    summary.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function search(push) {
+    var q = readForm();
+    if (isEmpty(q)) {
+      matches = [];
+      summary.innerHTML = '<p class="text-muted">Fill in at least one field above to search.</p>';
+      results.innerHTML = "";
+      pager.innerHTML = "";
+      return;
+    }
+    matches = records.filter(function (r) { return matchesQuery(r, q); });
+    page = 0;
+    summary.innerHTML = '<p class="h5 mb-0">' + matches.length.toLocaleString() +
+      (matches.length === 1 ? " record" : " records") + " found</p>";
+    render();
+    if (push) history.replaceState(null, "", "?" + new URLSearchParams(new FormData(form)).toString());
+  }
+
+  // Populate the three controlled-vocabulary dropdowns from the data itself,
+  // so they can never drift from what is actually in the collection.
+  function fillSelects() {
+    [["o", "f-origin"], ["g", "f-language"], ["r", "f-type"]].forEach(function (pair) {
+      var key = pair[0], el = document.getElementById(pair[1]);
+      var seen = Object.create(null);
+      records.forEach(function (r) { if (r[key]) seen[r[key]] = (seen[r[key]] || 0) + 1; });
+      Object.keys(seen).sort().forEach(function (v) {
+        var o = document.createElement("option");
+        o.value = v;
+        o.textContent = v + " (" + seen[v].toLocaleString() + ")";
+        el.appendChild(o);
+      });
+    });
+  }
+
+  // Restore a query from the URL so results can be linked and shared.
+  function applyURL() {
+    var p = new URLSearchParams(location.search);
+    var any = false;
+    ["t", "s", "l", "o", "g", "r", "from", "to"].forEach(function (k) {
+      var v = p.get(k);
+      if (v) { var el = form.elements[k]; if (el) { el.value = v; any = true; } }
+    });
+    return any;
+  }
+
+  form.addEventListener("submit", function (e) { e.preventDefault(); search(true); });
+  document.getElementById("adv-reset").addEventListener("click", function () {
+    setTimeout(function () {
+      history.replaceState(null, "", location.pathname);
+      search(false);
+    }, 0);
+  });
+
+  fetch(INDEX_URL)
+    .then(function (r) {
+      if (!r.ok) throw new Error("HTTP " + r.status);
+      return r.json();
+    })
+    .then(function (data) {
+      records = data;
+      fillSelects();
+      status.textContent = records.length.toLocaleString() + " records indexed";
+      if (applyURL()) search(false);
+      else summary.innerHTML = '<p class="text-muted">Fill in at least one field above to search.</p>';
+    })
+    .catch(function (err) {
+      status.textContent = "";
+      summary.innerHTML = '<div class="alert alert-warning">The search index could not be loaded (' +
+        esc(err.message) + "). Please reload the page.</div>";
+    });
+})();
+</script>

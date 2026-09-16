@@ -1,8 +1,8 @@
 display_name,stub,dropdown_parent
 Home,/
+About,/about.html
 Browse,/browse.html
-Subjects,/subjects.html
+Advanced Search,/advanced-search.html
 Timeline,/timeline.html
 Data,/data.html
-About,/about.html
-Main Archive,https://palestinian-children-archive.github.io/
+Main Archive,https://palestinianchildhoodarchive.org/

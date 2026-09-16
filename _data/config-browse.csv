@@ -1,4 +1,4 @@
 field,display_name,btn,hidden,sort_name
 date,Date,,,Date
 origin,Source,,,
-subject,,true
+subject,Subjects,,,
