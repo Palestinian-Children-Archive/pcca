@@ -58,10 +58,10 @@ $pca-r-lg:   16px;
 $pca-r-pill: 999px;
 
 // -- elevation -------------------------------------------------------------
-$pca-shadow-xs: 0 1px 2px rgba(13, 71, 161, .05);
-$pca-shadow-sm: 0 1px 3px rgba(13, 71, 161, .07);
-$pca-shadow-md: 0 4px 14px rgba(13, 71, 161, .09);
-$pca-shadow-lg: 0 14px 32px rgba(13, 71, 161, .16);
+$pca-shadow-xs: 0 1px 2px rgba(0, 0, 0, .06);
+$pca-shadow-sm: 0 1px 3px rgba(0, 0, 0, .09);
+$pca-shadow-md: 0 4px 14px rgba(0, 0, 0, .11);
+$pca-shadow-lg: 0 14px 32px rgba(0, 0, 0, .18);
 
 // -- motion ----------------------------------------------------------------
 $pca-ease:      .25s cubic-bezier(.4, 0, .2, 1);
@@ -70,7 +70,7 @@ $pca-lift:      -4px;   // the archive's card hover distance
 
 // -- type ------------------------------------------------------------------
 $pca-font:         Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;   // archive body
-$pca-font-heading: Roboto, Helvetica, Arial, sans-serif;                     // archive headings (MUI default)
+$pca-font-heading: "Source Serif 4", Georgia, "Times New Roman", serif;      // OU Libraries sets headings in a serif
 
 // -- spacing ---------------------------------------------------------------
 $pca-space-1: .25rem;
@@ -278,47 +278,56 @@ main { padding-bottom: $pca-space-7; }
 // 4. NAVBAR
 // ===========================================================================
 
+// A solid brand-coloured primary bar with uppercase, letterspaced items and an
+// underline on the current section, following OU Libraries' structure but in
+// the archive's blue rather than OU crimson.
 .navbar {
-    min-height: 70px;
+    min-height: 56px;
     padding-top: 0;
     padding-bottom: 0;
-    background-color: $pca-surface !important;
-    border-bottom: 1px solid $pca-border;
-    box-shadow: none;
+    background-color: $pca-blue !important;
+    border-bottom: 0;
+    box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .12);
 
     .navbar-brand {
         @include pca-heading(1.2rem, 600);
-        color: $pca-navy;
+        color: #fff;
         transition: transform $pca-ease;
 
-        &:hover { transform: scale(1.02); text-decoration: none; }
+        &:hover { transform: scale(1.02); text-decoration: none; color: #fff; }
     }
 
     .nav-link {
-        color: $pca-text;
-        font-size: .95rem;
-        font-weight: 500;
-        padding: $pca-space-2 $pca-space-4;
-        margin: 0 .1rem;
-        border-radius: $pca-r-pill;
-        transition: color $pca-ease, background-color $pca-ease;
+        color: rgba(255, 255, 255, .92);
+        font-size: .82rem;
+        font-weight: 600;
+        letter-spacing: .06em;
+        text-transform: uppercase;
+        padding: $pca-space-4 $pca-space-4;
+        margin: 0;
+        border-radius: 0;
+        border-bottom: 3px solid transparent;
+        transition: color $pca-ease, background-color $pca-ease, border-color $pca-ease;
 
         &:hover,
-        &:focus { color: $pca-blue; background-color: $pca-wash-07; }
+        &:focus { color: #fff; background-color: rgba(0, 0, 0, .14); }
 
-        // Bootstrap's .navbar-light .navbar-nav .nav-link.active is more
-        // specific than a bare .navbar .nav-link.active, so match its depth.
-        &.active { font-weight: 700; background-color: $pca-wash-12; }
+        // Bootstrap's .navbar-dark .navbar-nav .nav-link.active is three
+        // classes deep, so the colour rule below has to match that depth.
+        &.active { font-weight: 700; background-color: rgba(0, 0, 0, .18); }
     }
 
-    .navbar-nav .nav-link.active { color: $pca-blue; }
+    .navbar-nav .nav-link.active {
+        color: #fff;
+        border-bottom-color: #fff;
+    }
 
     .navbar-toggler {
-        border: 1px solid $pca-border;
+        border: 1px solid rgba(255, 255, 255, .5);
         border-radius: $pca-r-btn;
         padding: .35rem .6rem;
 
-        &:focus { box-shadow: none; @include pca-focus-ring; }
+        &:focus { box-shadow: none; @include pca-focus-ring(rgba(255, 255, 255, .85)); }
     }
 
     .dropdown-menu {
@@ -341,13 +350,19 @@ main { padding-bottom: $pca-space-7; }
 #nav-search,
 .navbar form {
     .form-control {
-        border-color: $pca-border;
+        background-color: rgba(255, 255, 255, .95);
+        border-color: transparent;
         border-right: 0;
         border-radius: $pca-r-btn 0 0 $pca-r-btn;
     }
 
     .btn {
+        background-color: rgba(255, 255, 255, .95);
+        border-color: transparent;
         border-radius: 0 $pca-r-btn $pca-r-btn 0;
+        color: $pca-blue;
+
+        &:hover { background-color: #fff; color: $pca-navy; }
     }
 }
 
@@ -364,7 +379,7 @@ main { padding-bottom: $pca-space-7; }
         content: "";
         position: absolute;
         inset: 0;
-        background: linear-gradient(180deg, rgba(13, 71, 161, .40) 0%, rgba(13, 71, 161, .62) 100%);
+        background: linear-gradient(180deg, rgba(0, 0, 0, .34) 0%, rgba(0, 0, 0, .52) 100%);
     }
 
     > * { position: relative; z-index: 1; }
@@ -377,7 +392,7 @@ main { padding-bottom: $pca-space-7; }
 
     // Bootstrap renders a .bg-dark band here; restyle it into the archive panel.
     > .bg-dark {
-        background-color: rgba(21, 101, 192, .90) !important;
+        background-color: rgba(21, 101, 192, .82) !important;
         @include pca-grid-texture(.16);
         max-width: 62rem;
         margin: 0 auto;
@@ -404,6 +419,85 @@ main { padding-bottom: $pca-space-7; }
     }
 
     a { color: #fff; }
+}
+
+// -- hero scoped search (OU Libraries pattern) ------------------------------
+#hero-search {
+    max-width: 44rem;
+    margin: $pca-space-6 auto 0;
+    text-align: left;
+}
+
+.hero-scopes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $pca-space-5;
+    border-bottom: 1px solid rgba(255, 255, 255, .35);
+    margin-bottom: $pca-space-4;
+}
+
+.hero-scope {
+    appearance: none;
+    background: none;
+    border: 0;
+    border-bottom: 3px solid transparent;
+    color: rgba(255, 255, 255, .78);
+    cursor: pointer;
+    font-family: $pca-font-heading;
+    font-size: 1.05rem;
+    font-weight: 600;
+    padding: 0 0 $pca-space-2;
+    margin-bottom: -1px;
+    transition: color $pca-ease, border-color $pca-ease;
+
+    &:hover { color: #fff; }
+
+    &.is-active {
+        color: #fff;
+        border-bottom-color: #fff;
+    }
+
+    &:focus-visible { @include pca-focus-ring(rgba(255, 255, 255, .9)); }
+}
+
+#hero-form {
+    .form-control {
+        background-color: #fff;
+        border: 0;
+        border-radius: $pca-r-btn 0 0 $pca-r-btn;
+        font-size: 1rem;
+        padding: .75rem 1rem;
+
+        &:focus { box-shadow: 0 0 0 .2rem rgba(255, 255, 255, .45); }
+    }
+
+    .btn {
+        border-radius: 0 $pca-r-btn $pca-r-btn 0;
+        font-weight: 600;
+        letter-spacing: .04em;
+        padding-left: $pca-space-6;
+        padding-right: $pca-space-6;
+        text-transform: uppercase;
+    }
+}
+
+.hero-advanced {
+    margin: $pca-space-4 0 0;
+
+    a {
+        color: #fff;
+        font-weight: 600;
+        text-decoration: underline;
+        text-underline-offset: 4px;
+
+        &:hover { color: rgba(255, 255, 255, .85); }
+    }
+}
+
+@media (max-width: 575.98px) {
+    .hero-scopes { gap: $pca-space-4; }
+    .hero-scope { font-size: .95rem; }
+    #hero-form .btn { padding-left: $pca-space-4; padding-right: $pca-space-4; }
 }
 
 // -- inner page title band -------------------------------------------------
@@ -1081,7 +1175,7 @@ main { padding-bottom: $pca-space-7; }
     }
 
     .bg-dark {
-        background-color: rgba(21, 101, 192, .90) !important;
+        background-color: rgba(21, 101, 192, .82) !important;
         @include pca-grid-texture(.16);
         padding: $pca-space-6 $pca-space-5 !important;
         width: 100%;

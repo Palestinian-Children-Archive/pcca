@@ -25,6 +25,37 @@
             </a>{% endif %}
             <h1 class="display-4">{{ site.title }}</h1>
             {% if site.tagline %}<p class="mb-0">{{ site.tagline }}</p>{% endif %}
+
+            {%- comment -%}
+              Scoped search, after the OU Libraries pattern: one box, tabs that
+              choose what is searched, and an advanced link beneath. Each tab
+              points at a destination that already exists - "Everything" is the
+              site-wide lunr search, the other two are the Advanced Search page
+              pre-filled with a single field.
+            {%- endcomment -%}
+            <div id="hero-search">
+              <div class="hero-scopes" role="tablist" aria-label="Choose what to search">
+                <button type="button" class="hero-scope is-active" role="tab" aria-selected="true"
+                        data-action="{{ '/search/' | relative_url }}" data-param="q">Everything</button>
+                <button type="button" class="hero-scope" role="tab" aria-selected="false"
+                        data-action="{{ '/advanced-search.html' | relative_url }}" data-param="t">Title</button>
+                <button type="button" class="hero-scope" role="tab" aria-selected="false"
+                        data-action="{{ '/advanced-search.html' | relative_url }}" data-param="s">Subject</button>
+              </div>
+
+              <form id="hero-form" role="search" method="get" action="{{ '/search/' | relative_url }}">
+                <div class="input-group input-group-lg">
+                  <label class="visually-hidden" for="hero-q">Search the collection</label>
+                  <input class="form-control" type="search" id="hero-q" name="q"
+                         placeholder="Find records, documents, photographs and more&hellip;">
+                  <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+              </form>
+
+              <p class="hero-advanced">
+                <a href="{{ '/advanced-search.html' | relative_url }}">Advanced Search</a>
+              </p>
+            </div>
         </div>
         {% unless site.data.theme.featured-image contains '/' %}
         <div class="position-absolute bottom-0 end-0 px-2 bg-dark bg-opacity-75">
@@ -49,3 +80,28 @@
     </div>
 </div>
 {%- endif -%}
+<script>
+(function () {
+  "use strict";
+  var wrap = document.getElementById("hero-search");
+  if (!wrap) return;
+  var form  = document.getElementById("hero-form");
+  var input = document.getElementById("hero-q");
+  var tabs  = wrap.querySelectorAll(".hero-scope");
+
+  Array.prototype.forEach.call(tabs, function (tab) {
+    tab.addEventListener("click", function () {
+      Array.prototype.forEach.call(tabs, function (t) {
+        t.classList.remove("is-active");
+        t.setAttribute("aria-selected", "false");
+      });
+      tab.classList.add("is-active");
+      tab.setAttribute("aria-selected", "true");
+      // Retarget the form at the destination this scope searches.
+      form.setAttribute("action", tab.dataset.action);
+      input.setAttribute("name", tab.dataset.param);
+      input.focus();
+    });
+  });
+})();
+</script>
