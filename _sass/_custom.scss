@@ -747,6 +747,120 @@ main { padding-bottom: $pca-space-7; }
     .card-body > :last-child { margin-top: auto; }
 }
 
+// ---------------------------------------------------------------------------
+// Result rows, shared by Browse and Advanced Search.
+// A list of full-width lines rather than a grid of cards, after the OU
+// Libraries results page: sequence number, resource type, title, then the
+// metadata beneath it.
+// ---------------------------------------------------------------------------
+.result-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid $pca-border;
+    counter-reset: result;   // Advanced Search overrides this per page
+}
+
+.result-row {
+    counter-increment: result;
+    display: flex;
+    gap: $pca-space-4;
+    align-items: flex-start;
+    padding: $pca-space-4 $pca-space-3;
+    border-bottom: 1px solid $pca-border;
+    background-color: $pca-surface;
+    transition: background-color $pca-ease-fast;
+
+    &:hover { background-color: $pca-wash-04; }
+}
+
+.result-num {
+    flex: 0 0 auto;
+    min-width: 2rem;
+    height: 2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid $pca-border;
+    border-radius: $pca-r-sm;
+    color: $pca-text-muted;
+    font-size: .8rem;
+    font-variant-numeric: tabular-nums;
+
+    &::before { content: counter(result); }
+}
+
+.result-icon {
+    flex: 0 0 auto;
+    width: 44px !important;
+    height: 44px;
+    padding: 9px;
+    object-fit: contain;
+    opacity: .34;
+    background: $pca-wash-07;
+    border-radius: $pca-r-sm;
+}
+
+.result-thumb {
+    flex: 0 0 auto;
+    width: 56px !important;
+    height: 72px;
+    object-fit: cover;
+    border: 1px solid $pca-border;
+    border-radius: $pca-r-sm;
+}
+
+.result-body { flex: 1 1 auto; min-width: 0; }
+
+.result-type {
+    color: $pca-text-muted;
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+    margin: 0 0 $pca-space-1;
+}
+
+.result-title {
+    @include pca-heading(1.05rem, 600);
+    margin: 0 0 $pca-space-1;
+    line-height: 1.35;
+
+    a {
+        color: $pca-blue;
+        text-decoration: none;
+
+        &:hover { color: $pca-navy; text-decoration: underline; }
+    }
+}
+
+.result-meta {
+    color: $pca-text-muted;
+    font-size: .88rem;
+    line-height: 1.5;
+    margin: 0;
+
+    strong { color: $pca-text; font-weight: 600; }
+}
+
+.result-subjects {
+    color: $pca-text-muted;
+    font-size: .82rem;
+    margin: $pca-space-2 0 0;
+}
+
+.result-actions {
+    flex: 0 0 auto;
+
+    .btn { white-space: nowrap; }
+}
+
+@media (max-width: 575.98px) {
+    .result-row { padding: $pca-space-4 0; gap: $pca-space-3; }
+    .result-num { display: none; }
+    .result-title { font-size: 1rem; }
+}
+
 // ===========================================================================
 // 11. ITEM PAGE
 // ===========================================================================

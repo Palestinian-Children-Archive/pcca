@@ -64,7 +64,7 @@ layout: page
 </form>
 
 <div id="adv-summary" class="mb-3"></div>
-<div id="adv-results" class="row"></div>
+<ul id="adv-results" class="result-list"></ul>
 <nav id="adv-pager" class="my-4 text-center"></nav>
 
 <script>
@@ -73,6 +73,15 @@ layout: page
 
   var INDEX_URL = "{{ '/assets/data/advanced-search-index.json' | relative_url }}";
   var ITEM_URL  = "{{ '/item.html' | relative_url }}";
+  var ICON_BASE = "{{ '/assets/lib/icons/' | relative_url }}";
+
+  // Match Browse, which shows a small format icon beside each row.
+  var ICONS = { text: "file-text", image: "image", map: "map",
+                video: "film", interview: "soundwave" };
+  function iconFor(type) {
+    var key = (type || "").trim().toLowerCase().split(",")[0];
+    return ICON_BASE + (ICONS[key] || "file-earmark") + ".svg";
+  }
   var PAGE_SIZE = 24;
 
   var records = [];
@@ -147,19 +156,23 @@ layout: page
   function render() {
     var start = page * PAGE_SIZE;
     var slice = matches.slice(start, start + PAGE_SIZE);
+    results.style.counterReset = "result " + start;
 
     results.innerHTML = slice.map(function (r) {
-      var meta = [];
-      if (r.d) meta.push("<strong>Date:</strong> " + esc(r.d));
-      if (r.o) meta.push("<strong>Source:</strong> " + esc(r.o));
-      if (r.r) meta.push("<strong>Type:</strong> " + esc(r.r));
-      if (r.g) meta.push("<strong>Language:</strong> " + esc(r.g));
-      return '<div class="item col-lg-4 col-md-6 col-sm-12 mb-2"><div class="card">' +
-        '<div class="card-body">' +
-        '<h2 class="card-title h6"><a href="' + ITEM_URL + '?id=' + encodeURIComponent(r.id) + '">' + esc(r.t || "Untitled") + "</a></h2>" +
-        '<p class="card-text">' + meta.join("<br>") + "</p>" +
-        (r.s ? '<p class="card-text adv-subjects">' + esc(r.s) + "</p>" : "") +
-        "</div></div></div>";
+      var facts = [];
+      if (r.d) facts.push("<strong>Date:</strong> " + esc(r.d));
+      if (r.o) facts.push("<strong>Source:</strong> " + esc(r.o));
+      if (r.g) facts.push("<strong>Language:</strong> " + esc(r.g));
+      return '<li class="result-row">' +
+        '<span class="result-num"></span>' +
+        '<img class="result-icon" src="' + iconFor(r.r) + '" alt="" aria-hidden="true">' +
+        '<div class="result-body">' +
+          (r.r ? '<p class="result-type">' + esc(r.r) + "</p>" : "") +
+          '<h3 class="result-title"><a href="' + ITEM_URL + "?id=" + encodeURIComponent(r.id) + '">' + esc(r.t || "Untitled") + "</a></h3>" +
+          (facts.length ? '<p class="result-meta">' + facts.join("<br>") + "</p>" : "") +
+          (r.s ? '<p class="result-subjects">' + esc(r.s) + "</p>" : "") +
+        "</div>" +
+      "</li>";
     }).join("");
 
     var total = Math.ceil(matches.length / PAGE_SIZE);

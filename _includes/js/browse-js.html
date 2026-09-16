@@ -41,20 +41,23 @@ function makeCard(obj) {
     } else {
         thumbSrc = '{{ "/assets/lib/icons/" | relative_url }}{{ icons.icon-default }}.svg';
     }  
-    // start card
-    var card = '<div class="item col-lg-4 col-md-6 col-sm-12 mb-2"><div class="card">';
-    // top image for photos
+    // start row -- a full-width line, not a card in a grid
+    var card = '<li class="result-row"><span class="result-num"></span>';
+    // a real thumbnail for photographs, otherwise the small format icon
     if(imgSrc) {
-        card += '<a href="' + itemHref + '"> <img class="card-img-top lazyload" data-src="' + imgSrc + '" alt="Image of ' + obj.title + '"></a>';
+        card += '<a href="' + itemHref + '"><img class="result-thumb lazyload" data-src="' + imgSrc + '" alt="Image of ' + obj.title + '"></a>';
+    } else if(thumbSrc){
+        card += '<img class="result-icon lazyload" data-src="' + thumbSrc + '" alt="">';
+    }
+    card += '<div class="result-body">';
+    // resource type, above the title
+    if(obj.format != "") {
+        card += '<p class="result-type">' + obj.format.split("/").pop().replace("_", " ").toUpperCase() + '</p>';
     }
     // title
-    card += '<div class="card-body text-center"> <h3 class="card-title h4"><a href="' + itemHref + '" class="text-dark">' + obj.title + '</a></h3>';
-    // thumb for non-photo items
-    if(thumbSrc){
-        card += '<p><a href="' + itemHref + '"><img class="lazyload w-50" data-src="' + thumbSrc + '" alt="Image of ' + obj.title + '"></a></p>';
-    }
+    card += '<h3 class="result-title"><a href="' + itemHref + '">' + obj.title + '</a></h3>';
     // other fields
-    card += '<p class="card-text">';
+    card += '<p class="result-meta">';
     {% for f in fields %}{% unless f.hidden == 'true' %}
     if(obj[{{ f.field | jsonify }}]){
     {% if f.display_name %}card += '<strong>{{ f.display_name }}:</strong> ';{% endif %}
@@ -72,29 +75,9 @@ function makeCard(obj) {
     }
     {% endunless %}{% endfor %}
     card += '</p>';
-    // media type
-    if(obj.format != "") {
-        card += '<p class="card-text"><small><a class="btn btn-sm btn-outline-secondary" href="{{ page.url | relative_url }}#' + encodeURIComponent(obj.format) + '">' + 
-        obj.format.split("/").pop().replace("_", " ").toUpperCase() + ' <svg class="bi icon-sprite"><use xlink:href="{{ "/assets/lib/cb-icons.svg" | relative_url }}#';
-        if(obj.format.includes('image')){
-            card += 'icon-image';
-        } else if(obj.format.includes('audio')){
-            card += 'icon-audio';
-        } else if(obj.format.includes('video')){
-            card += 'icon-video';
-        } else if(obj.format.includes('multiple')){
-            card += 'icon-multiple';
-        } else if(obj.format.includes('compound')){
-            card += 'icon-compound-object';
-        } else {
-            card += 'icon-default';
-        }
-        card += '"></span></a></small></p>';
-    }
-    // view button
-    card += '<hr><a href="' + itemHref + '" class="btn btn-sm btn-light" title="link to ' + obj.title + '">View Full Record</a>';
-    // close divs
-    card += '</div></div></div>';
+    // No "View Full Record" button: the title above is already a link to the
+    // same place, and the duplicate is what made these rows tall.
+    card += '</div></li>';
     // send back big string
     return card;
 }
