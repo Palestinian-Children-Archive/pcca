@@ -1126,27 +1126,51 @@ main { padding-bottom: $pca-space-7; }
 // ===========================================================================
 
 #timeline {
-    .card {
-        @include pca-lift;
-        height: 100%;
+    border-top: 1px solid $pca-border;
 
-        .card-body { padding: $pca-space-4; }
+    > tbody > tr > th {
+        width: 7.5rem;
+        padding: $pca-space-4 $pca-space-4 $pca-space-4 0;
+        vertical-align: top;
 
-        .h5 {
-            @include pca-heading(1rem, 600);
-
-            a, &.text-dark { color: $pca-navy !important; }
+        h3 {
+            @include pca-heading(1.35rem, 600);
+            font-variant-numeric: tabular-nums;
+            margin: 0;
+            position: sticky;
+            top: $pca-space-4;   // the year stays in view while its entries scroll past
         }
     }
 
-    // Same oversized format icons as browse; reuse the shared treatment.
-    .card img:not(.card-img-top):not(.img-thumbnail) { @include pca-format-icon(52px); }
+    > tbody > tr > td { padding: $pca-space-2 0; }
+}
 
-    .timeline-thumb {
-        border: 1px solid $pca-border;
-        border-radius: $pca-r-card;
-        padding: 0;
-        background: $pca-surface;
+// Rows the timeline nests inside a table cell, where the cell already sets
+// the indent and the year heading beside them does the grouping. The list
+// runs flush there: no outer rule, no side padding, no background of its own,
+// and no rule under the last row, since the table draws that one.
+.result-list--flush {
+    border-top: 0;
+
+    .result-row {
+        padding-left: 0;
+        padding-right: 0;
+        background-color: transparent;
+
+        &:hover { background-color: $pca-wash-04; }
+        &:last-child { border-bottom: 0; }
+    }
+}
+
+@media (max-width: 767.98px) {
+    // Stack the year above its entries rather than squeezing both into a row.
+    #timeline {
+        > tbody > tr > th,
+        > tbody > tr > td { display: block; width: auto; padding: 0; }
+
+        > tbody > tr > th { padding-top: $pca-space-4; }
+        > tbody > tr > th h3 { position: static; }
+        > tbody > tr > td { padding-bottom: $pca-space-3; }
     }
 }
 
