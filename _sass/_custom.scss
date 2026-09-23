@@ -1433,6 +1433,43 @@ main { padding-bottom: $pca-space-7; }
 
     #footer-credits img { max-height: 28px; opacity: .75; }
     #footer-logo { max-height: 60px; }
+
+    // Creative Commons licence line. The CC icons are black SVGs served by
+    // Creative Commons; dimmed so they sit at the weight of the muted text.
+    .footer-license {
+        color: $pca-text-muted;
+        font-size: .875rem;
+        line-height: 1.6;
+
+        a {
+            color: $pca-text;
+            font-weight: 500;
+            text-decoration: underline;
+            text-decoration-color: rgba($pca-text, .3);
+            text-underline-offset: .2em;
+
+            &:hover { color: $pca-blue; text-decoration-color: currentColor; }
+        }
+    }
+
+    // Keep "CC BY-NC-ND 4.0" and its icons together when the line wraps.
+    .cc-license { white-space: nowrap; }
+
+    .cc-icons {
+        display: inline-flex;
+        gap: .2em;
+        margin-left: .4em;
+        vertical-align: -.2em;
+
+        img {
+            width: 1.15em;
+            height: 1.15em;
+            opacity: .7;
+            transition: opacity $pca-ease-fast;
+        }
+    }
+
+    .cc-license:hover .cc-icons img { opacity: 1; }
 }
 
 // ===========================================================================
